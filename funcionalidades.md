@@ -10,7 +10,7 @@ Este documento rastreia o progresso do desenvolvimento da plataforma, dividido p
 
 ---
 
-## [Nome do Desenvolvedor A]
+## Raquel
 **Foco:** Autenticação, Infraestrutura de Imagem e Tratamento de Exceções.
 
 ### Sprint 1

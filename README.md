@@ -31,6 +31,9 @@ Certifique-se de ter instalado em sua máquina:
 2. Execute a aplicação utilizando o Maven Wrapper:
     ```bash
     ./mvnw spring-boot:run
+    ou
+    ```bash
+    mvn spring-boot:run
 3. A API estará rodando em http://localhost:8080.
 
 ### 3. Rodando o Front-end (React + Vite)
