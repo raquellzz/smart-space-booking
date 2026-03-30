@@ -25,31 +25,31 @@ Este documento rastreia o progresso do desenvolvimento da plataforma, dividido p
 
 ---
 
-## [Nome do Desenvolvedor B]
-**Foco:** Domínio de Espaços, Integração com IA e Sistema de Reputação.
+## [Bianca]
+**Foco:** Domínio de Espaços, Encerramentos e Sistema de Reputação.
 
 ### Sprint 1
 - [ ] **UC04:** Cadastrar salas (CRUD de salas e utilitários)
 - [ ] **UC02:** Buscar salas e utensílios (Filtros e vitrine no front-end)
 
 ### Sprint 2
-- [ ] Integração com Gemini 1.5 Flash API (Client HTTP Spring, processamento do prompt)
-- [ ] **UC07:** Auditoria de estado inicial via IA (Comparação com padrão e tela de loading/veredito)
+- [ ] **UC08:** Check-out visual com foto (Fluxo de saída e obrigatoriedade de imagem)
+- [ ] **UC09:** Auditoria de estado final via IA (Prompt de limpeza/integridade e feedback do ambiente)
 
 ### Sprint 3
 - [ ] **UC11:** Atualizar dinamicamente Trust Score (Service de leitura de logs e painel de histórico do usuário)
 
 ---
 
-## [Nome do Desenvolvedor C]
-**Foco:** Transações de Reserva, Encerramentos e Dashboard Administrativo.
+## [Luigi]
+**Foco:** Transações de Reserva, Integração com IA e Dashboard Administrativo.
 
 ### Sprint 1
 - [ ] **UC03:** Reservar sala (Validação de conflitos de horário, componente de calendário/grade)
 
 ### Sprint 2
-- [ ] **UC08:** Check-out visual com foto (Fluxo de saída e obrigatoriedade de imagem)
-- [ ] **UC09:** Auditoria de estado final via IA (Prompt de limpeza/integridade e feedback do ambiente)
+- [ ] Integração com Gemini 1.5 Flash API (Client HTTP Spring, processamento do prompt)
+- [ ] **UC07:** Auditoria de estado inicial via IA (Comparação com padrão e tela de loading/veredito)
 
 ### Sprint 3
 - [ ] **UC12:** Configurar regras de negócio - Dashboard ADM (Endpoints de parametrização e painel gerencial)
