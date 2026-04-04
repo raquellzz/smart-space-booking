@@ -1,4 +1,4 @@
-package imd.ufrn.com.br.smart_space_booking.dto;
+package imd.ufrn.com.br.smart_space_booking.user.dto;
 
 public record UsuarioResponseDTO(Long id, String email, String nome, Integer trustScore, String perfil) {
 }
