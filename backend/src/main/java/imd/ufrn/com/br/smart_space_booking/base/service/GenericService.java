@@ -1,6 +1,6 @@
 package imd.ufrn.com.br.smart_space_booking.base.service;
 
-import imd.ufrn.com.br.smart_space_booking.base.mapper.DtoMapper;
+import imd.ufrn.com.br.smart_space_booking.base.mappers.DtoMapper;
 import imd.ufrn.com.br.smart_space_booking.base.model.BaseEntity;
 import imd.ufrn.com.br.smart_space_booking.base.repository.GenericRepository;
 import imd.ufrn.com.br.smart_space_booking.base.utils.exception.ResourceNotFoundException;

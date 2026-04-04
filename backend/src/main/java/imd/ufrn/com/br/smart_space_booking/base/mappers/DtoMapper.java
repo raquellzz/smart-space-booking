@@ -1,4 +1,4 @@
-package imd.ufrn.com.br.smart_space_booking.base.mapper;
+package imd.ufrn.com.br.smart_space_booking.base.mappers;
 
 import java.util.List;
 
