@@ -1,14 +1,16 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { cadastrarSala } from '../../services/api'
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { getSalaById, atualizarSala } from '../../services/api';
 import './CadastroSala.css';
 import './Admin.css';
 import '../../App.css';
 import SSBLogo from '../../assets/SSBLogo.png';
 
-function CadastroSala() {
+function EditarSala() {
+  const { id } = useParams(); 
   const navigate = useNavigate();
-  
+  const [loading, setLoading] = useState(true);
+
   const [formData, setFormData] = useState({
     nome: '',
     capacidade: '',
@@ -18,6 +20,34 @@ function CadastroSala() {
     caracteristicasTexto: '',
     imagem: ''
   });
+
+  useEffect(() => {
+    async function carregarDadosDaSala() {
+      try {
+        const response = await getSalaById(id);
+        console.log("Dados que vieram do Banco:", response.data);
+        const sala = response.data;
+
+        setFormData({
+          nome: sala.nome,
+          capacidade: sala.capacidade,
+          local: sala.local,
+          status: sala.status,
+          tipoSala: sala.tipo,
+          caracteristicasTexto: sala.caracteristicas ? sala.caracteristicas.join(', ') : '',
+          //imagem: sala.imagem || ''
+        });
+      } catch (error) {
+        console.error("Erro ao carregar dados da sala:", error);
+        alert("Erro ao buscar dados da sala.");
+        navigate('/admin');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    carregarDadosDaSala();
+  }, [id, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,15 +68,17 @@ function CadastroSala() {
         //imagem: formData.imagem
       };
 
-      await cadastrarSala(dadosParaEnviar);
+      await atualizarSala(id, dadosParaEnviar);
       
-      alert("Sala cadastrada com sucesso!");
+      alert("Sala atualizada com sucesso!");
       navigate('/admin');
     } catch (error) {
-      console.error("Erro ao cadastrar sala:", error);
-      alert("Falha ao cadastrar a sala. Verifique se o Back-end está rodando.");
+      console.error("Erro ao atualizar sala:", error);
+      alert("Falha ao atualizar a sala.");
     }
   };
+
+  if (loading) return <div className="admin-container"><p>Carregando dados...</p></div>;
 
   return (
     <div className="admin-container">
@@ -62,16 +94,15 @@ function CadastroSala() {
 
       <main className="admin-main">
         <div className="page-header">
-          <h1 className="page-title">Cadastro de Sala</h1>
+          <h1 className="page-title">Atualizar Sala</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="cadastro-form">
           <div className="input-group">
-            <label>Nome da Sala (ex: B402 - IMD)</label>
+            <label>Nome da Sala</label>
             <input 
               type="text" 
               required 
-              placeholder="Digite o nome identificador"
               value={formData.nome}
               onChange={(e) => setFormData({...formData, nome: e.target.value})}
             />
@@ -79,17 +110,16 @@ function CadastroSala() {
 
           <div className="form-row">
             <div className="input-group">
-              <label>Capacidade (Pessoas)</label>
+              <label>Capacidade</label>
               <input 
                 type="number" 
                 required 
-                placeholder="Ex: 10"
                 value={formData.capacidade}
                 onChange={(e) => setFormData({...formData, capacidade: e.target.value})}
               />
             </div>
             <div className="input-group">
-              <label>Status Inicial</label>
+              <label>Status</label>
               <select 
                 value={formData.status}
                 onChange={(e) => setFormData({...formData, status: e.target.value})}
@@ -110,16 +140,14 @@ function CadastroSala() {
               <option value="CONFERENCIA">Sala de Conferência</option>
               <option value="LABORATORIO">Laboratório</option>
               <option value="ESTUDO_INDIVIDUAL">Sala de Estudo Individual</option>
-
             </select>
           </div>
 
           <div className="input-group">
-            <label>Localização (Prédio/Andar)</label>
+            <label>Localização</label>
             <input 
               type="text" 
               required 
-              placeholder="Ex: Terceiro andar, B402"
               value={formData.local}
               onChange={(e) => setFormData({...formData, local: e.target.value})}
             />
@@ -129,18 +157,15 @@ function CadastroSala() {
             <label>Características (Separe por vírgula)</label>
             <input 
               type="text" 
-              placeholder="Ex: TV, Ar-condicionado, Wi-Fi"
               value={formData.caracteristicasTexto}
               onChange={(e) => setFormData({...formData, caracteristicasTexto: e.target.value})}
             />
-            <small style={{color: '#666', fontSize: '12px'}}>Os itens serão listados individualmente na visualização.</small>
           </div>
 
           <div className="input-group">
-            <label>Imagem da Sala</label>
+            <label>Imagem da Sala (Link)</label>
             <input 
               type="text" 
-              placeholder="Cole o link da foto"
               value={formData.imagem}
               onChange={(e) => setFormData({...formData, imagem: e.target.value})}
             />
@@ -151,7 +176,7 @@ function CadastroSala() {
               Cancelar
             </button>
             <button type="submit" className="btn-primary btn-save">
-              Salvar Sala
+              Salvar Alterações
             </button>
           </div>
         </form>
@@ -160,4 +185,4 @@ function CadastroSala() {
   );
 }
 
-export default CadastroSala;
+export default EditarSala;

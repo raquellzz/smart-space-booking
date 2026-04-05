@@ -3,6 +3,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Admin from './pages/adminPages/Admin';
 import CadastroSala from './pages/adminPages/CadastroSala';  
+import EditarSala from './pages/adminPages/EditarSala';  
 //import Home from './Home';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
            {/*<Route path="/home" element={<Home />} />*/}
           <Route path="/admin" element={<Admin />} />
           <Route path="/cadastrar-sala" element={<CadastroSala />} />
+          <Route path="/editar-sala/:id" element={<EditarSala />} />
         </Routes>
         </div>
     </AuthProvider>
