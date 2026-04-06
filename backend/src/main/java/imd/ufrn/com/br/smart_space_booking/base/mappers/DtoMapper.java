@@ -7,7 +7,7 @@ import java.util.List;
  * <p>
  * Usage example for a concrete mapper:
  * <pre>{@code
- * @Mapper(componentModel = "spring", config = NexusMapperConfig.class)
+ * @Mapper(componentModel = "spring", config = BaseMapperConfig.class)
  * public interface ProductMapper extends DtoMapper<Product, ProductDTO> {
  *     // MapStruct generates toDto(Product), toEntity(ProductDTO) and toDto(List<Product>)
  * }

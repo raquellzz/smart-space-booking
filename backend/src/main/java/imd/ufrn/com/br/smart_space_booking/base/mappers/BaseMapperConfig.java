@@ -7,7 +7,7 @@ import org.mapstruct.ReportingPolicy;
 /**
  * Centralized MapStruct configuration shared across all mappers in the project.
  * <p>
- * Apply via: {@code @Mapper(config = NexusMapperConfig.class)}
+ * Apply via: {@code @Mapper(config = BaseMapperConfig.class)}
  * <ul>
  *   <li>{@code componentModel = "spring"} — mappers are injected as Spring beans.</li>
  *   <li>{@code unmappedTargetPolicy = ERROR} — compile-time error when a target field

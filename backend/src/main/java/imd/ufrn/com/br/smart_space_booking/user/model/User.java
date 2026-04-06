@@ -1,6 +1,7 @@
 package imd.ufrn.com.br.smart_space_booking.user.model;
 
 import imd.ufrn.com.br.smart_space_booking.base.model.BaseEntity;
+import imd.ufrn.com.br.smart_space_booking.reservation.model.Reservation;
 import imd.ufrn.com.br.smart_space_booking.score.model.ScoreTransaction;
 import imd.ufrn.com.br.smart_space_booking.user.enums.UserType;
 import jakarta.persistence.*;
@@ -27,7 +28,10 @@ public class User extends BaseEntity {
     private UserType type;
 
     @OneToMany(mappedBy = "user")
-    private List<ScoreTransaction> transactions = new ArrayList<>();
+    private List<ScoreTransaction> scoreTransactions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Reservation> reservations = new ArrayList<>();
 
     public void addScore(int amount) {
         this.score += amount;
@@ -51,6 +55,10 @@ public class User extends BaseEntity {
     public UserType getType() { return type; }
     public void setType(UserType type) { this.type = type; }
 
-    public List<ScoreTransaction> getTransactions() { return transactions; }
-    public void setTransactions(List<ScoreTransaction> transactions) { this.transactions = transactions; }
+    public List<ScoreTransaction> getScoreTransactions() { return scoreTransactions; }
+    public void setScoreTransactions(List<ScoreTransaction> scoreTransactions) { this.scoreTransactions = scoreTransactions; }
+
+    public List<Reservation> getReservations() { return reservations; }
+    public void setReservations(List<Reservation> reservations) { this.reservations = reservations; }
+
 }

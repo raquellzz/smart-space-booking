@@ -20,13 +20,13 @@ public class UserController extends GenericController<User, UserDTO, UserService
         this.userService = userService;
     }
 
-    @GetMapping()
-    public String getHelloWorld (){
-        return "HELLO WORLD";
-    }
+//    @GetMapping()
+//    public String getHelloWorld (){
+//        return "HELLO WORLD";
+//    }
 
 
-    @PostMapping("/accesso")
+    @PostMapping("/access")
     public ResponseEntity<ApiResponseDTO<UserDTO>> makeAccess(@RequestBody UserLoginDTO dto) {
         UserDTO userDTO = userService.makeAccess(dto);
 
