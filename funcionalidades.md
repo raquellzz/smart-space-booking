@@ -30,7 +30,7 @@ Este documento rastreia o progresso do desenvolvimento da plataforma, dividido p
 
 ### Sprint 1
 - [X] **UC04:** Cadastrar salas (CRUD de salas e utilitários)
-- [ ] **UC02:** Buscar salas e utensílios (Filtros e vitrine no front-end)
+- [X] **UC02:** Buscar salas e localização (Filtros e vitrine no front-end)
 
 ### Sprint 2
 - [ ] **UC08:** Check-out visual com foto (Fluxo de saída e obrigatoriedade de imagem)
