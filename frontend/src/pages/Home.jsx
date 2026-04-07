@@ -57,7 +57,7 @@ function Home() {
 
         <div className="header-right">
           <span className="user-icon material-icons">account_circle</span>
-          <span>Admin</span>
+          <span>User</span>
         </div>
       </header>
 
