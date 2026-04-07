@@ -4,6 +4,7 @@ import axios from "axios";
 import { AuthContext } from "../contexts/AuthContext";
 import "./Login.css";
 import SSBLogo from "../assets/SSBLogo.png";
+import { loginUsuario } from '../services/api';
 
 function Login() {
   const navigate = useNavigate();
@@ -13,24 +14,29 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (email.trim() !== "" && nome.trim() !== "") {
-      try {
-        const response = axios.post(
-          "http://localhost:8080/api/usuarios/acesso",
-          {
-            email: email,
-            nome: nome,
-          },
-        );
-        login(response.data);
-        navigate("/home");
-      } catch (error) {
-        console.error("Erro ao fazer login:", error);
-        alert("Falha ao conectar com o servidor.");
-      }
-    } else {
+
+    if (!email.trim() || !nome.trim()) {
       alert("Por favor, preencha todos os campos!");
+      return;
     }
+
+    try {
+      const response = await loginUsuario({ email, nome });
+      const usuario = response.data;
+
+      login(usuario); 
+
+      if (usuario.perfil === 'ADMIN') {
+        navigate("/admin");
+      } else {
+        navigate("/home");
+      }
+
+    } catch (error) {
+      console.error("Erro no login:", error);
+      alert(error.response?.data?.message || "Erro ao acessar o sistema.");
+
+    };
   };
 
   return (
