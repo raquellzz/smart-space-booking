@@ -1,0 +1,62 @@
+services:
+  smart-space-booking-postgres:
+    container_name: smart-space-booking-postgres
+    image: postgres:16.0-alpine
+    environment:
+      POSTGRES_DB: smart-space-booking
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "123"
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5433:5432"
+    volumes:
+      - smart-space-booking-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d smart-space-booking"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  smart-space-booking-api:
+    container_name: smart-space-booking-api
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      smart-space-booking-postgres:
+        condition: service_healthy
+    environment:
+      DB_USERNAME: postgres
+      DB_PASSWORD: "123"
+      JAVA_OPTS: "-Xmx512m -Xms256m"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ~/.m2:/root/.m2
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8080/api/actuator/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    develop:
+      watch:
+        - action: rebuild
+          path: ./src/main/java
+        - action: rebuild
+          path: ./src/main/resources
+        - action: rebuild
+          path: ./pom.xml
+
+volumes:
+  smart-space-booking-data:
