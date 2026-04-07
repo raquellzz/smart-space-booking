@@ -1,8 +1,8 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import SSBLogo from "../assets/SSBLogo.png";
-import { AuthContext } from "../contexts/AuthContext";
-import { loginUsuario } from "../services/api";
+import SSBLogo from "../../assets/SSBLogo.png";
+import { AuthContext } from "../../contexts/AuthContext";
+import { loginUsuario } from "../../services/api";
 import "./Login.css";
 
 function Login() {

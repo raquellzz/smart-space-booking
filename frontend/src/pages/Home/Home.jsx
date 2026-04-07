@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getSalas } from '../services/api';
+import { getSalas } from '../../services/api';
 import './adminPages/Admin.css';
 import '../App.css';
 import './Home.css';
