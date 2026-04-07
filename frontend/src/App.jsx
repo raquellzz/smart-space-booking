@@ -4,6 +4,7 @@ import Admin from "./pages/adminPages/Admin";
 import CadastroSala from "./pages/adminPages/CadastroSala";
 import EditarSala from "./pages/adminPages/EditarSala";
 import Login from "./pages/Login";
+import Home from "./pages/Home";
 import Reserva from "./pages/reserva/Reserva";
 
 function App() {
@@ -13,7 +14,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
-          {/* <Route path="/home" element={<Home />} /> */}
+          <Route path="/home" element={<Home />} />
           <Route path="/criar-reserva/:id" element={<Reserva />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/cadastrar-sala" element={<CadastroSala />} />

@@ -1,0 +1,77 @@
+.sala-card {
+  background: var(--white);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.sala-image-container {
+  width: 100%;
+  height: 150px;
+}
+
+.sala-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sala-content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sala-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sala-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color:  var(--primary-color);
+  margin: 0;
+}
+
+.sala-capacity {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-gray);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.capacity-icon {
+  font-size: 18px !important;
+}
+
+.sala-location {
+  color: var(--text-gray);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.sala-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+  margin-bottom: 12px;
+}
+
+.feature-tag {
+  background: #f0f0f5;
+  color: #555;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
