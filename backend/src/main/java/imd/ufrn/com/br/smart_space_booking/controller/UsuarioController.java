@@ -12,8 +12,7 @@ import imd.ufrn.com.br.smart_space_booking.dto.UsuarioResponseDTO;
 import imd.ufrn.com.br.smart_space_booking.service.UsuarioService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
-@RequestMapping("/api/usuarios")
+@RequestMapping("/usuarios")
 public class UsuarioController {
 
     private final UsuarioService usuarioService;

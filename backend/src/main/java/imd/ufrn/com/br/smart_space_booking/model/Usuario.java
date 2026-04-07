@@ -26,7 +26,6 @@ public class Usuario {
 
     private String perfil = "USER";
 
-    // Construtor vazio exigido pelo JPA
     public Usuario() {}
 
     public Usuario(String email, String nome) {
