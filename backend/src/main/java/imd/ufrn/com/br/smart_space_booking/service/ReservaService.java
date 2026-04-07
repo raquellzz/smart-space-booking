@@ -1,5 +1,6 @@
 package imd.ufrn.com.br.smart_space_booking.service;
 
+import imd.ufrn.com.br.smart_space_booking.dto.HorarioOcupadoDTO;
 import imd.ufrn.com.br.smart_space_booking.dto.ReservaRequestDTO;
 import imd.ufrn.com.br.smart_space_booking.dto.ReservaResponseDTO;
 import imd.ufrn.com.br.smart_space_booking.enums.ReservaStatus;
@@ -13,6 +14,8 @@ import imd.ufrn.com.br.smart_space_booking.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -70,6 +73,15 @@ public class ReservaService {
 
         return ReservaResponseDTO.fromEntity(reserva);
     }
+
+    public List<HorarioOcupadoDTO> findOcupados(Long salaId, LocalDate data) {
+        ZonedDateTime inicioDia = data.atStartOfDay(ZoneId.of("America/Fortaleza"));
+        ZonedDateTime fimDia = inicioDia.plusDays(1).minusNanos(1);
+
+        return reservaRepository.findReservasPorSalaNoDia(salaId, inicioDia, fimDia)
+                .stream()
+                .map(HorarioOcupadoDTO::fromEntity)
+                .toList();}
 
     public List<ReservaResponseDTO> findAll() {
         return reservaRepository.findAll()

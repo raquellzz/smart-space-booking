@@ -1,10 +1,9 @@
-import { useState, useContext } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { AuthContext } from "../contexts/AuthContext";
-import "./Login.css";
 import SSBLogo from "../assets/SSBLogo.png";
-import { loginUsuario } from '../services/api';
+import { AuthContext } from "../contexts/AuthContext";
+import { loginUsuario } from "../services/api";
+import "./Login.css";
 
 function Login() {
   const navigate = useNavigate();
@@ -24,19 +23,17 @@ function Login() {
       const response = await loginUsuario({ email, nome });
       const usuario = response.data;
 
-      login(usuario); 
+      login(usuario);
 
-      if (usuario.perfil === 'ADMIN') {
+      if (usuario.perfil === "ADMIN") {
         navigate("/admin");
       } else {
         navigate("/home");
       }
-
     } catch (error) {
       console.error("Erro no login:", error);
       alert(error.response?.data?.message || "Erro ao acessar o sistema.");
-
-    };
+    }
   };
 
   return (

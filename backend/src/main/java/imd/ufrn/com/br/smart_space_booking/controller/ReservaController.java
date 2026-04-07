@@ -1,16 +1,17 @@
 package imd.ufrn.com.br.smart_space_booking.controller;
 
+import imd.ufrn.com.br.smart_space_booking.dto.HorarioOcupadoDTO;
 import imd.ufrn.com.br.smart_space_booking.dto.ReservaRequestDTO;
 import imd.ufrn.com.br.smart_space_booking.dto.ReservaResponseDTO;
 import imd.ufrn.com.br.smart_space_booking.service.ReservaService;
-import imd.ufrn.com.br.smart_space_booking.service.UsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/reservas")
 public class ReservaController {
@@ -23,6 +24,15 @@ public class ReservaController {
     @PostMapping
     public ResponseEntity<ReservaResponseDTO> create(@RequestBody ReservaRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(reservaService.create(dto));
+    }
+
+    @GetMapping("/ocupados")
+    public ResponseEntity<List<HorarioOcupadoDTO>> getOcupados(
+            @RequestParam Long salaId,
+            @RequestParam String data) {
+
+        LocalDate localDate = LocalDate.parse(data);
+        return ResponseEntity.ok(reservaService.findOcupados(salaId, localDate));
     }
 
     @GetMapping
