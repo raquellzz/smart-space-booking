@@ -1,11 +1,13 @@
 package imd.ufrn.com.br.smart_space_booking.audit.model;
 
 import imd.ufrn.com.br.smart_space_booking.base.model.BaseEntity;
+import imd.ufrn.com.br.smart_space_booking.base.model.BaseImage;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name="audit_images")
-public class AuditImage extends BaseEntity {
+@Table(name = "audit_images")
+public class AuditImage extends BaseImage {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "audit_image_seq")
     @SequenceGenerator(name = "audit_image_seq", sequenceName = "audit_image_id_seq", allocationSize = 1)
@@ -15,9 +17,7 @@ public class AuditImage extends BaseEntity {
     @JoinColumn(name = "audit_id", nullable = false)
     private Audit audit;
 
-    @Lob
-    @Column(name = "file", nullable = false)
-    private byte[] file;
+    public AuditImage() {}
 
     @Override
     public Long getId() { return id; }
@@ -27,8 +27,4 @@ public class AuditImage extends BaseEntity {
 
     public Audit getAudit() { return audit; }
     public void setAudit(Audit audit) { this.audit = audit; }
-
-    public byte[] getFile() { return file; }
-    public void setFile(byte[] file) { this.file = file; }
-
 }

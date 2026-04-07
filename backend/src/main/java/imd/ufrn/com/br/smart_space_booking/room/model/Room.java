@@ -42,9 +42,9 @@ public class Room extends BaseEntity {
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private List<Reservation> reservations = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "room_id")
-    private List<Resource> resources = new ArrayList<>();
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("displayOrder ASC")
+    private List<RoomImage> images = new ArrayList<>();
 
     public Room() {}
 
@@ -75,6 +75,6 @@ public class Room extends BaseEntity {
     public List<Reservation> getReservations() { return reservations; }
     public void setReservations(List<Reservation> reservations) { this.reservations = reservations; }
 
-    public List<Resource> getResources() { return resources; }
-    public void setResources(List<Resource> resources) { this.resources = resources;}
+    public List<RoomImage> getImages() { return images; }
+    public void setImages(List<RoomImage> images) { this.images = images;}
 }
