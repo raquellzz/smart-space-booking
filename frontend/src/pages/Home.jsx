@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'; // Adicionado useEffect
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getSalas } from '../services/api'; // Adicione este import
+import { getSalas } from '../services/api';
 import './adminPages/Admin.css';
 import '../App.css';
 import './Home.css';
@@ -10,6 +10,7 @@ import imagemMockada from '../assets/mockImagemSala.jpg';
 function Home() {
   const [salas, setSalas] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [termoBusca, setTermoBusca] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,6 +30,14 @@ function Home() {
 
   if (loading) return <div className="p-10 text-center text-xl font-bold">Carregando salas...</div>;
 
+  const salasFiltradas = salas.filter((sala) => {
+    const busca = termoBusca.toLowerCase();
+    return (
+      sala.nome.toLowerCase().includes(busca) || 
+      sala.local.toLowerCase().includes(busca)
+    );
+  });
+
   return (
     <div className="admin-container">
       <header className="admin-header">
@@ -38,7 +47,12 @@ function Home() {
 
         <div className="search-bar">
           <span className="material-icons search-icon">search</span>
-          <input type="text" placeholder="Pesquise uma sala" />
+          <input
+            type="text"
+            placeholder="Pesquise uma sala ou localização"
+            value={termoBusca}
+            onChange={(e) => setTermoBusca(e.target.value)}
+          />
         </div>
 
         <div className="header-right">
@@ -53,10 +67,10 @@ function Home() {
         </div>
 
         <section className="rooms-grid">
-          {salas.length === 0 ? (
+          {salasFiltradas.length === 0 ? (
             <p>Nenhuma sala encontrada.</p>
           ) : (
-            salas.map(sala => (
+            salasFiltradas.map(sala => (
               <div className="sala-card">
                 <div className="sala-image-container">
                   <img src={sala.imagem || imagemMockada} alt={sala.nome} className="sala-image" />

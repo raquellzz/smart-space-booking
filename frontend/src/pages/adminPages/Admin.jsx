@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'; // Adicionado useEffect
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { deletarSala, getSalas } from '../../services/api'; // Adicione este import
+import { deletarSala, getSalas } from '../../services/api';
 import './Admin.css';
 import '../../App.css';
 import SSBLogo from '../../assets/SSBLogo.png';
@@ -9,6 +9,7 @@ import imagemMockada from '../../assets/mockImagemSala.jpg';
 function Admin() {
   const [salas, setSalas] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [termoBusca, setTermoBusca] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,6 +26,15 @@ function Admin() {
     }
     carregarSalas();
   }, []);
+
+  
+  const salasFiltradas = salas.filter((sala) => {
+    const busca = termoBusca.toLowerCase();
+    return (
+      sala.nome.toLowerCase().includes(busca) || 
+      sala.local.toLowerCase().includes(busca)
+    );
+  });
 
   const handleDelete = async (id) => {
     try {
@@ -58,7 +68,12 @@ function Admin() {
 
         <div className="search-bar">
           <span className="material-icons search-icon">search</span>
-          <input type="text" placeholder="Pesquise uma sala" />
+          <input
+            type="text"
+            placeholder="Pesquise uma sala ou localização"
+            value={termoBusca}
+            onChange={(e) => setTermoBusca(e.target.value)}
+          />
         </div>
 
         <div className="header-right">
@@ -77,10 +92,10 @@ function Admin() {
         </div>
 
         <section className="rooms-grid">
-          {salas.length === 0 ? (
+          {salasFiltradas.length === 0 ? (
             <p>Nenhuma sala encontrada.</p>
           ) : (
-            salas.map(sala => (
+            salasFiltradas.map(sala => (
               <div key={sala.id} className="room-card">
                 <div className="room-card-main-content">
                   <div className="room-text-content">

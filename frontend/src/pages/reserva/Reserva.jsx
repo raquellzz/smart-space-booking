@@ -224,10 +224,6 @@ export default function Reserva() {
         <div className="header-left">
           <img className="logo-admin" src={SSBLogo} alt="Logo" />
         </div>
-        <div className="search-bar">
-          <span className="material-icons search-icon">search</span>
-          <input type="text" placeholder="Pesquise uma sala" />
-        </div>
         <div className="header-right">
           <span className="user-icon material-icons">account_circle</span>
           <span>Admin</span>
