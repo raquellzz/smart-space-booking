@@ -14,7 +14,7 @@ Este documento rastreia o progresso do desenvolvimento da plataforma, dividido p
 **Foco:** Autenticação, Infraestrutura de Imagem e Tratamento de Exceções.
 
 ### Sprint 1
-- [ ] **UC01:** Acesso simplificado via e-mail corporativo (Tabela de usuários, login, Context API React)
+- [X] **UC01:** Acesso simplificado via e-mail corporativo (Tabela de usuários, login, Context API React)
 
 ### Sprint 2
 - [ ] **UC06:** Check-in visual com foto (Serviço de upload, interface de câmera/arquivo, timer de 10 min)
@@ -29,7 +29,7 @@ Este documento rastreia o progresso do desenvolvimento da plataforma, dividido p
 **Foco:** Domínio de Espaços, Encerramentos e Sistema de Reputação.
 
 ### Sprint 1
-- [ ] **UC04:** Cadastrar salas (CRUD de salas e utilitários)
+- [X] **UC04:** Cadastrar salas (CRUD de salas e utilitários)
 - [ ] **UC02:** Buscar salas e utensílios (Filtros e vitrine no front-end)
 
 ### Sprint 2
@@ -45,7 +45,7 @@ Este documento rastreia o progresso do desenvolvimento da plataforma, dividido p
 **Foco:** Transações de Reserva, Integração com IA e Dashboard Administrativo.
 
 ### Sprint 1
-- [ ] **UC03:** Reservar sala (Validação de conflitos de horário, componente de calendário/grade)
+- [X] **UC03:** Reservar sala (Validação de conflitos de horário, componente de calendário/grade)
 
 ### Sprint 2
 - [ ] Integração com Gemini 1.5 Flash API (Client HTTP Spring, processamento do prompt)
