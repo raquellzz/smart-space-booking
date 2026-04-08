@@ -8,6 +8,8 @@ import Home from "./pages/Home";
 import Reserva from "./pages/reserva/Reserva";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AcessoNegado from "./pages/acessoNegado/acessoNegado";
+import Perfil from "./pages/perfil/Perfil";
+import Layout from "./components/Layout";
 
 function App() {
   return (
@@ -19,7 +21,9 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/acesso-negado" element={<AcessoNegado />} />
 
-          <Route 
+          <Route element={<Layout />}>
+            {/* Rotas exclusivas de USER e ADMIN */}
+            <Route 
             path="/home" 
             element={
               <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
@@ -27,48 +31,49 @@ function App() {
               </ProtectedRoute>
             } 
           />
-          <Route 
-            path="/criar-reserva/:id" 
-            element={
-              <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
-                <Reserva />
-              </ProtectedRoute>
-            } 
-          />
+            <Route
+              path="/criar-reserva/:id"
+              element={
+                <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
+                  <Reserva />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* <Route 
-            path="/perfil-usuario" 
-            element={
-              <ProtectedRoute allowedRoles={['USER']}>
-                <PerfilUsuario />
-              </ProtectedRoute>
-            } 
-          /> */}
-
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute allowedRoles={["ADMIN"]}>
-                <Admin />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-          path="/cadastrar-sala"
-          element={
-            <ProtectedRoute allowedRoles={["ADMIN"]}>
-              <CadastroSala />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/editar-sala/:id"
-          element={
-            <ProtectedRoute allowedRoles={["ADMIN"]}>
-              <EditarSala />
-            </ProtectedRoute>
-          }
-        />
+            <Route
+              path="/perfil"
+              element={
+                <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
+                  <Perfil />
+                </ProtectedRoute>
+              }
+            />
+            {/* Rotas Exclusivas de ADMIN */}
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute allowedRoles={["ADMIN"]}>
+                  <Admin />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cadastrar-sala"
+              element={
+                <ProtectedRoute allowedRoles={["ADMIN"]}>
+                  <CadastroSala />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/editar-sala/:id"
+              element={
+                <ProtectedRoute allowedRoles={["ADMIN"]}>
+                  <EditarSala />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
         </Routes>
       </div>
     </AuthProvider>

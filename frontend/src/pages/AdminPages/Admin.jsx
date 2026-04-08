@@ -9,7 +9,9 @@ import imagemMockada from '../../assets/mockImagemSala.jpg';
 function Admin() {
   const [salas, setSalas] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [termoBusca, setTermoBusca] = useState("");
+  // const [termoBusca, setTermoBusca] = useState("");
+  const [searchParams] = useSearchParams();
+  const termoBusca = searchParams.get('busca') || "";
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -61,26 +63,6 @@ function Admin() {
 
   return (
     <div className="admin-container">
-      <header className="admin-header">
-        <div className="header-left">
-          <img className="logo-admin" src={SSBLogo} alt="S.S.B. Logo" />
-        </div>
-
-        <div className="search-bar">
-          <span className="material-icons search-icon">search</span>
-          <input
-            type="text"
-            placeholder="Pesquise uma sala ou localização"
-            value={termoBusca}
-            onChange={(e) => setTermoBusca(e.target.value)}
-          />
-        </div>
-
-        <div className="header-right">
-          <span className="user-icon material-icons">account_circle</span>
-          <span>Admin</span>
-        </div>
-      </header>
 
       <main className="admin-main">
         <div className="page-header">
