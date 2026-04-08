@@ -28,7 +28,7 @@ function Login() {
       if (usuario.perfil === "ADMIN") {
         navigate("/admin");
       } else {
-        navigate("/perfil");
+        navigate("/home");
       }
     } catch (error) {
       console.error("Erro no login:", error);

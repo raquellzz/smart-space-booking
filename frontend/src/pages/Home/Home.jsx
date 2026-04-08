@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getSalas } from '../../services/api';
-import './adminPages/Admin.css';
-import '../App.css';
+import '../AdminPages/Admin.css';
+import '../../App.css';
 import './Home.css';
-import SSBLogo from '../assets/SSBLogo.png';
-import imagemMockada from '../assets/mockImagemSala.jpg';
+import SSBLogo from '../../assets/SSBLogo.png';
+import imagemMockada from '../../assets/mockImagemSala.jpg';
 
 function Home() {
   const [salas, setSalas] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [termoBusca, setTermoBusca] = useState("");
+  const [searchParams] = useSearchParams();
+  const termoBusca = searchParams.get('busca') || "";
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,27 +41,6 @@ function Home() {
 
   return (
     <div className="admin-container">
-      <header className="admin-header">
-        <div className="header-left">
-          <img className="logo-admin" src={SSBLogo} alt="S.S.B. Logo" />
-        </div>
-
-        <div className="search-bar">
-          <span className="material-icons search-icon">search</span>
-          <input
-            type="text"
-            placeholder="Pesquise uma sala ou localização"
-            value={termoBusca}
-            onChange={(e) => setTermoBusca(e.target.value)}
-          />
-        </div>
-
-        <div className="header-right">
-          <span className="user-icon material-icons">account_circle</span>
-          <span>User</span>
-        </div>
-      </header>
-
       <main className="admin-main">
         <div className="page-header">
           <h1 className="page-title">Explorar salas</h1>

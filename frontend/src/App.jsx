@@ -1,14 +1,14 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
-import Admin from "./pages/adminPages/Admin";
-import CadastroSala from "./pages/adminPages/CadastroSala";
-import EditarSala from "./pages/adminPages/EditarSala";
-import Login from "./pages/login/Login";
-import Home from "./pages/Home";
-import Reserva from "./pages/reserva/Reserva";
+import Admin from "./pages/AdminPages/Admin";
+import CadastroSala from "./pages/AdminPages/CadastroSala";
+import EditarSala from "./pages/AdminPages/EditarSala";
+import Login from "./pages/Login/Login";
+import Home from "./pages/Home/Home";
+import Reserva from "./pages/Reserva/Reserva";
 import ProtectedRoute from "./components/ProtectedRoute";
-import AcessoNegado from "./pages/acessoNegado/acessoNegado";
-import Perfil from "./pages/perfil/Perfil";
+import AcessoNegado from "./pages/AcessoNegado/AcessoNegado";
+import Perfil from "./pages/Perfil/Perfil";
 import Layout from "./components/Layout";
 
 function App() {

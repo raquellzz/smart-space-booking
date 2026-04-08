@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import SSBLogo from '../../assets/SSBLogo.png';
-import './acessoNegado.css';
+import './AcessoNegado.css';
 
 function AcessoNegado() {
   const navigate = useNavigate();
