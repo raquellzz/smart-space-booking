@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { deletarSala, getSalas } from '../../services/api';
 import './Admin.css';
 import '../../App.css';
@@ -9,7 +9,6 @@ import imagemMockada from '../../assets/mockImagemSala.jpg';
 function Admin() {
   const [salas, setSalas] = useState([]);
   const [loading, setLoading] = useState(true);
-  // const [termoBusca, setTermoBusca] = useState("");
   const [searchParams] = useSearchParams();
   const termoBusca = searchParams.get('busca') || "";
   const navigate = useNavigate();

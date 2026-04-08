@@ -82,16 +82,6 @@ function EditarSala() {
 
   return (
     <div className="admin-container">
-      <header className="admin-header">
-        <div className="header-left">
-          <img className="logo-admin" src={SSBLogo} alt="S.S.B. Logo" />
-        </div>
-        <div className="header-right">
-          <span className="user-icon material-icons">account_circle</span>
-          <span>Admin</span>
-        </div>
-      </header>
-
       <main className="admin-main">
         <div className="page-header">
           <h1 className="page-title">Atualizar Sala</h1>

@@ -14,6 +14,8 @@ export const atualizarSala = (id, salaData) =>
   api.put(`/salas/${id}`, salaData);
 
 export const criarReserva = (reservaData) => api.post("/reservas", reservaData);
+export const getReservasUsuario = (usuarioId) => api.get(`/reservas/usuario/${usuarioId}`);
+export const getReservaById = (id) => api.get(`/reservas/${id}`);
 
 export const getHorariosOcupados = (salaId, data) =>
   api.get("/reservas/ocupados", {

@@ -1,0 +1,139 @@
+import { useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { AuthContext } from '../../contexts/AuthContext';
+import './Perfil.css';
+
+function Perfil() {
+  const { user, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+  
+  const [historicoReservas, setHistoricoReservas] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  useEffect(() => {
+    async function carregarMinhasReservas() {
+      try {
+        const response = await axios.get('http://localhost:8080/api/reservas');
+        
+        const minhasReservas = response.data.filter(
+          (r) => r.usuarioId === user?.id || r.usuario?.id === user?.id
+        );
+
+        const reservasFormatadas = minhasReservas.map((r) => {
+          const dataInicio = new Date(r.inicioDatetime);
+          const dataFim = new Date(r.fimDatetime);
+
+          let dataFormatada = dataInicio.toLocaleDateString('pt-BR', {
+            day: '2-digit', month: 'short', year: 'numeric'
+          }).replace(' de ', ' ').replace('.', '');
+          
+          const horaInicio = dataInicio.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+          const horaFim = dataFim.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+          let statusVisual = r.status;
+          if (r.status === 'CONFIRMADA') statusVisual = 'FAZER CHECK-IN';
+          if (r.status === 'ENCERRADA') statusVisual = 'CONCLUÍDA';
+
+          return {
+            id: r.id,
+            sala: r.sala?.nome || r.salaNome || "Sala Indisponível",
+            data: dataFormatada,
+            horario: `${horaInicio} - ${horaFim}`,
+            status: statusVisual
+          };
+        });
+
+        setHistoricoReservas(reservasFormatadas);
+
+      } catch (error) {
+        console.error("Erro ao buscar histórico:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (user) {
+      carregarMinhasReservas();
+    }
+  }, [user]);
+
+  const getStatusClass = (status) => {
+    switch (status) {
+      case 'FAZER CHECK-IN': return 'status-checkin';
+      case 'CONCLUÍDA': return 'status-concluida';
+      case 'CANCELADA': return 'status-cancelada';
+      default: return '';
+    }
+  };
+
+  return (
+    <div className="perfil-container">
+      <main className="perfil-content">
+        <h1 className="page-title">Perfil</h1>
+
+        {/* Card principal do usuário */}
+        <section className="user-card">
+          <div className="user-details">
+            <h2 className="user-name">{user?.nome || 'Usuário Desconhecido'}</h2>
+            <p className="user-email">{user?.email || 'email@ssb-corp.com'}</p>
+            
+            <div className="trust-score-badge">
+              <span className="score-label">TRUST SCORE:</span>
+              <span className="score-value">★ {user?.trustScore || 100}/100</span>
+            </div>
+          </div>
+          
+          <button className="logout-button" onClick={handleLogout}>
+            🚪 Sair da Conta
+          </button>
+        </section>
+
+        {/* Histórico de reservas */}
+        <section className="history-section">
+          <div className="history-header">
+            <h2>Histórico de Reservas</h2>
+            <p>Gerencie suas utilizações de espaços de trabalho.</p>
+          </div>
+
+          {loading ? (
+            <p style={{ color: '#666' }}>Carregando seu histórico de reservas...</p>
+          ) : historicoReservas.length === 0 ? (
+            <p style={{ color: '#666' }}>Você ainda não possui reservas registradas.</p>
+          ) : (
+            <div className="reservations-list">
+              {historicoReservas.map((reserva) => (
+                <div key={reserva.id} className={`reservation-card ${getStatusClass(reserva.status)}`}>
+                  <div className="reservation-info">
+                    <h3>{reserva.sala}</h3>
+                    <div className="reservation-datetime">
+                      <span>📅 {reserva.data}</span>
+                      <span>🕒 {reserva.horario}</span>
+                    </div>
+                  </div>
+                  
+                  {reserva.status === 'FAZER CHECK-IN' ? (
+                    <button className="badge checkin-btn">
+                      {reserva.status} &gt;
+                    </button>
+                  ) : (
+                    <span className={`badge ${getStatusClass(reserva.status)}`}>
+                      {reserva.status}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      </main>
+    </div>
+  );
+}
+
+export default Perfil;

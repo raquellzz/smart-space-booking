@@ -143,12 +143,6 @@ export default function Reserva() {
   if (erro) {
     return (
       <div className="admin-container">
-        <header className="admin-header">
-          <div className="header-left">
-            <img className="logo-admin" src={SSBLogo} alt="Logo" />
-          </div>
-        </header>
-
         <main className="admin-main centered-content">
           <div className="error-screen">
             <i className="material-icons error-icon">
@@ -220,15 +214,6 @@ export default function Reserva() {
           </div>
         </div>
       )}
-      <header className="admin-header">
-        <div className="header-left">
-          <img className="logo-admin" src={SSBLogo} alt="Logo" />
-        </div>
-        <div className="header-right">
-          <span className="user-icon material-icons">account_circle</span>
-          <span>User</span>
-        </div>
-      </header>
 
       <main className="admin-main centered-content">
         <div className="reserva-wrapper">
