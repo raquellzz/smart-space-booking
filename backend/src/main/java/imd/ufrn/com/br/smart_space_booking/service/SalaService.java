@@ -43,7 +43,7 @@ public class SalaService {
             salaExistente.setStatus(salaDadosNovos.getStatus());
             salaExistente.setTipoSala(salaDadosNovos.getTipoSala());
             salaExistente.setCaracteristicas(salaDadosNovos.getCaracteristicas());
-            //salaExistente.setImagem(salaDadosNovos.getImagem());
+            salaExistente.setImagens(salaDadosNovos.getImagens());
             Sala salaAtualizada = salaRepository.save(salaExistente);
             return convertToDTO(salaAtualizada);
 
@@ -65,6 +65,7 @@ public class SalaService {
                 sala.getCapacidade(),
                 sala.getTipoSala().toString(),
                 sala.getStatus().toString(),
-                sala.getCaracteristicas());
+                sala.getCaracteristicas(),
+                sala.getImagens());
     }
 }
