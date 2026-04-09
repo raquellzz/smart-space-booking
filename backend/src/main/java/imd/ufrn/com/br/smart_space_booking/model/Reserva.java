@@ -51,5 +51,16 @@ public class Reserva {
     @JoinColumn(name = "sala_id", nullable = false)
     private Sala sala;
 
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = ZonedDateTime.now();
+        this.updatedAt = ZonedDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = ZonedDateTime.now();
+    }
+
 }
 

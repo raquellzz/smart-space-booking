@@ -18,7 +18,7 @@ public class UsuarioService {
 
     public UsuarioResponseDTO realizarAcesso(UsuarioLoginDTO loginDTO) {
         return usuarioRepository.findByEmail(loginDTO.email())
-                .map(usuario -> convertToDTO(usuario)) // Se já existe, retorna o DTO
+                .map(usuario -> convertToDTO(usuario))
                 .orElseGet(() -> {
                     Usuario novoUsuario = new Usuario();
                     novoUsuario.setEmail(loginDTO.email());
