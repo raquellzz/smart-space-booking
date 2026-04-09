@@ -238,7 +238,7 @@ export default function Reserva() {
             <div className="reserva-sala-header">
               <div className="sala-info-main">
                 <img
-                  src={sala?.imagem || imagemMockada}
+                  src={sala.imagens[0] || imagemMockada}
                   alt="Sala"
                   className="sala-img-mini"
                 />

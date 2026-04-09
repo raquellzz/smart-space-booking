@@ -91,7 +91,7 @@ function Admin() {
 
                   <div className="room-image-container">
                     {/* Fallback para imagem mockada caso o banco não tenha URL */}
-                    <img src={sala.imagem || imagemMockada} alt={sala.nome} className="room-card-img" />
+                    <img src={sala.imagens[0] || imagemMockada} alt={sala.nome} className="room-card-img" />
                   </div>
                 </div>
 

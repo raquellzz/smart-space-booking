@@ -53,7 +53,7 @@ function Home() {
             salasFiltradas.map(sala => (
               <div className="sala-card">
                 <div className="sala-image-container">
-                  <img src={sala.imagem || imagemMockada} alt={sala.nome} className="sala-image" />
+                  <img src={sala.imagens[0] || imagemMockada} alt={sala.nome} className="sala-image" />
                 </div>
 
                 <div className="sala-content">
