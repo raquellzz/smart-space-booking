@@ -3,10 +3,13 @@ package imd.ufrn.com.br.smart_space_booking.service;
 import imd.ufrn.com.br.smart_space_booking.dto.SalaResponseDTO;
 import imd.ufrn.com.br.smart_space_booking.model.Sala;
 import imd.ufrn.com.br.smart_space_booking.repository.SalaRepository;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+
+import imd.ufrn.com.br.smart_space_booking.exception.SalaNotFoundException;
 
 @Service
 public class SalaService {
@@ -47,7 +50,7 @@ public class SalaService {
             Sala salaAtualizada = salaRepository.save(salaExistente);
             return convertToDTO(salaAtualizada);
 
-        }).orElseThrow(() -> new RuntimeException("Sala com ID " + id + " não encontrada!"));
+        }).orElseThrow(() -> new SalaNotFoundException("Sala com ID " + id + " não encontrada!"));
     }
 
     public boolean deletar(Long id) {
