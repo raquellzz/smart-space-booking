@@ -4,6 +4,8 @@ import imd.ufrn.com.br.smart_space_booking.enums.ReservaStatus;
 import imd.ufrn.com.br.smart_space_booking.enums.ReservaTipo;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.ZonedDateTime;
 
@@ -32,6 +34,14 @@ public class Reserva {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ReservaTipo tipo;
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private ZonedDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at", nullable = false)
+    private ZonedDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id")

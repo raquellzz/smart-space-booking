@@ -50,4 +50,10 @@ public class ReservaController {
         reservaService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/usuario/{usuarioId}")
+    public ResponseEntity<List<ReservaResponseDTO>> findByUsuario(@PathVariable Long usuarioId) {
+        return ResponseEntity.ok(reservaService.findByUsuario(usuarioId));
+    }
+
 }

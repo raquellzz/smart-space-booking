@@ -13,7 +13,9 @@ public record ReservaResponseDTO(
         ReservaStatus status,
         ReservaTipo tipo,
         Long usuarioId,
-        Long salaId
+        Long salaId,
+        ZonedDateTime createdAt,
+        ZonedDateTime updatedAt
 ) {
     public static ReservaResponseDTO fromEntity(Reserva reserva) {
         return new ReservaResponseDTO(
@@ -23,7 +25,9 @@ public record ReservaResponseDTO(
                 reserva.getStatus(),
                 reserva.getTipo(),
                 reserva.getUsuario() != null ? reserva.getUsuario().getId() : null,
-                reserva.getSala().getId()
+                reserva.getSala().getId(),
+                reserva.getCreatedAt(),
+                reserva.getUpdatedAt()
         );
     }
 }

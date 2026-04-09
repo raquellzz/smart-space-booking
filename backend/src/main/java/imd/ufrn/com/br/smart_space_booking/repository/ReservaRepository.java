@@ -30,4 +30,9 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
             @Param("inicio") ZonedDateTime inicio,
             @Param("fim") ZonedDateTime fim
     );
+
+    @Query("SELECT r FROM Reserva r WHERE r.usuario.id = :usuarioId " +
+            "AND r.tipo <> 'MANUTENCAO' " +
+            "ORDER BY r.createdAt DESC")
+    List<Reserva> findReservasPorUsuario(@Param("usuarioId") Long usuarioId);
 }

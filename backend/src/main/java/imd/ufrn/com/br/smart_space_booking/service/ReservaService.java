@@ -102,4 +102,14 @@ public class ReservaService {
                 .orElseThrow(() -> new RuntimeException("Reserva não encontrada"));
         reservaRepository.delete(reserva);
     }
+
+    public List<ReservaResponseDTO> findByUsuario(Long usuarioId) {
+        usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        return reservaRepository.findReservasPorUsuario(usuarioId)
+                .stream()
+                .map(ReservaResponseDTO::fromEntity)
+                .toList();
+    }
 }
