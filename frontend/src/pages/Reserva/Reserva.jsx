@@ -57,6 +57,14 @@ function calcDurationLabel(inicio, fim) {
   return label.trim();
 }
 
+const getDataLocalISO = () => {
+  const d = new Date();
+  const ano = d.getFullYear();
+  const mes = String(d.getMonth() + 1).padStart(2, "0");
+  const dia = String(d.getDate()).padStart(2, "0");
+  return `${ano}-${mes}-${dia}`;
+};
+
 export default function Reserva() {
   const { user } = useContext(AuthContext);
   const { id } = useParams();
@@ -69,7 +77,8 @@ export default function Reserva() {
   const [submitting, setSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
-  const [data, setData] = useState(new Date().toISOString().split("T")[0]);
+  const [data, setData] = useState(getDataLocalISO());
+
   const [inicio, setInicio] = useState(getHoraAtual());
   const [fim, setFim] = useState("");
   const [horariosOcupados, setHorariosOcupados] = useState([]);
@@ -281,7 +290,7 @@ export default function Reserva() {
                     value={data}
                     onChange={(e) => setData(e.target.value)} // Muda o estado 'data'
                     className="figma-input-large"
-                    min={new Date().toISOString().split("T")[0]}
+                    min={getDataLocalISO()}
                   />
                   <i className="material-icons">calendar_month</i>
                 </div>
