@@ -1,6 +1,7 @@
 import { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { getReservasUsuario } from '../../services/api';
 import { AuthContext } from '../../contexts/AuthContext';
 import './Perfil.css';
 
@@ -18,16 +19,23 @@ function Perfil() {
 
   useEffect(() => {
     async function carregarMinhasReservas() {
+      if (!user?.id) {
+        console.log("ID do usuário não disponível. Verifique o estado de autenticação.");
+        setLoading(false);
+        return;
+      }
       try {
-        const response = await axios.get('http://localhost:8080/api/reservas');
+        console.log("Buscando reservas para o usuário ID:", user.id);
+        const response = await getReservasUsuario(user?.id);
+        console.log("Reservas que vieram do Banco:", response.data);
         
-        const minhasReservas = response.data.filter(
-          (r) => r.usuarioId === user?.id || r.usuario?.id === user?.id
-        );
+        const reservasFormatadas = response.data.map((r) => {
+          
+          const campoInicio = r.inicioDateTime; 
+          const campoFim = r.fimDateTime;
 
-        const reservasFormatadas = minhasReservas.map((r) => {
-          const dataInicio = new Date(r.inicioDatetime);
-          const dataFim = new Date(r.fimDatetime);
+          const dataInicio = new Date(campoInicio);
+          const dataFim = new Date(campoFim);
 
           let dataFormatada = dataInicio.toLocaleDateString('pt-BR', {
             day: '2-digit', month: 'short', year: 'numeric'
@@ -42,7 +50,7 @@ function Perfil() {
 
           return {
             id: r.id,
-            sala: r.sala?.nome || r.salaNome || "Sala Indisponível",
+            sala: `Sala ${r.salaNome}` || `Sala #${r.salaId}`, 
             data: dataFormatada,
             horario: `${horaInicio} - ${horaFim}`,
             status: statusVisual
@@ -58,9 +66,7 @@ function Perfil() {
       }
     }
 
-    if (user) {
-      carregarMinhasReservas();
-    }
+    carregarMinhasReservas();
   }, [user]);
 
   const getStatusClass = (status) => {
