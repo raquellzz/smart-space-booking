@@ -3,6 +3,7 @@ package imd.ufrn.com.br.smart_space_booking.model;
 import imd.ufrn.com.br.smart_space_booking.enums.StatusSala;
 import imd.ufrn.com.br.smart_space_booking.enums.TipoSala;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,15 +38,22 @@ public class Sala {
     @Column(name = "caracteristica")
     private List<String> caracteristicas = new ArrayList<>();
 
+    @ElementCollection
+    @CollectionTable(name = "sala_imagens", joinColumns = @JoinColumn(name = "sala_id"))
+    @Column(name = "imagem")
+    @NotEmpty(message = "A sala deve ter pelo menos uma imagem.")
+    private List<String> imagens = new ArrayList<>();
+
     public Sala() {}
 
-    public Sala(String nome, String local, StatusSala status, TipoSala tipoSala, Integer capacidade, List<String> caracteristicas) {
+    public Sala(String nome, String local, StatusSala status, TipoSala tipoSala, Integer capacidade, List<String> caracteristicas, List<String> imagens) {
         this.nome = nome;
         this.local = local;
         this.status = status;
         this.tipoSala = tipoSala;
         this.capacidade = capacidade;
         this.caracteristicas = caracteristicas;
+        this.imagens = imagens;
     }
 
     public Long getId() {return id;}
@@ -68,4 +76,7 @@ public class Sala {
 
     public List<String> getCaracteristicas() {return caracteristicas;}
     public void setCaracteristicas(List<String> caracteristicas) {this.caracteristicas = caracteristicas;}
+
+    public List<String> getImagens() {return imagens;}
+    public void setImagens(List<String> imagens) {this.imagens = imagens;}
 }
