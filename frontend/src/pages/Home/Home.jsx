@@ -7,6 +7,8 @@ import './Home.css';
 import SSBLogo from '../../assets/SSBLogo.png';
 import imagemMockada from '../../assets/mockImagemSala.jpg';
 
+const FILE_SERVER_URL = import.meta.env.VITE_API_FILES_URL;
+
 function Home() {
   const [salas, setSalas] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,7 +55,8 @@ function Home() {
             salasFiltradas.map(sala => (
               <div className="sala-card">
                 <div className="sala-image-container">
-                  <img src={sala.imagem || imagemMockada} alt={sala.nome} className="sala-image" />
+                  <span className="sala-type-tag">{sala.tipoSala || sala.tipo}</span>
+                  <img src={`${FILE_SERVER_URL}/${sala.imagens[0]}` || imagemMockada} alt={sala.nome} className="sala-image" />
                 </div>
 
                 <div className="sala-content">
