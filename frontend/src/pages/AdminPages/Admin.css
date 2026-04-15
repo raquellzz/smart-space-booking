@@ -98,8 +98,8 @@
 
 /* --- IMAGEM NO CARD --- */
 .room-image-container {
-  width: 110px;
-  height: 75px;
+  width: 120px;
+  height: 90px;
   flex-shrink: 0;
 }
 

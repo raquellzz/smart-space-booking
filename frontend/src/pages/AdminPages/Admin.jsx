@@ -6,6 +6,8 @@ import '../../App.css';
 import SSBLogo from '../../assets/SSBLogo.png';
 import imagemMockada from '../../assets/mockImagemSala.jpg';
 
+const FILE_SERVER_URL = import.meta.env.VITE_API_FILES_URL;
+
 function Admin() {
   const [salas, setSalas] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -90,10 +92,16 @@ function Admin() {
                   </div>
 
                   <div className="room-image-container">
-                    {/* Fallback para imagem mockada caso o banco não tenha URL */}
-                    <img src={sala.imagem || imagemMockada} alt={sala.nome} className="room-card-img" />
+                    {/* Fallback para imagem mockada caso o banco não tenha imagem */}
+                    <img src={`${FILE_SERVER_URL}/${sala.imagens[0]}` || imagemMockada} alt={sala.nome} className="room-card-img" />
                   </div>
                 </div>
+
+                <div className="sala-features">
+                    {sala.caracteristicas && sala.caracteristicas.map((feature, index) => (
+                      <span key={index} className="feature-tag">{feature}</span>
+                    ))}
+                  </div>
 
                 <div className="room-card-footer">
                   <div className="room-actions">
