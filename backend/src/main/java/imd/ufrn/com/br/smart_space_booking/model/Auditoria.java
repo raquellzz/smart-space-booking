@@ -1,0 +1,63 @@
+package imd.ufrn.com.br.smart_space_booking.model;
+
+
+import imd.ufrn.com.br.smart_space_booking.enums.AuditoriaCategoria;
+import imd.ufrn.com.br.smart_space_booking.enums.AuditoriaTipo;
+import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "auditoria")
+public class Auditoria {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "reservation_id", nullable = false)
+    private Reserva reserva;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo", nullable = false)
+    private AuditoriaTipo tipo;
+
+    @Column(name = "resultado_ia", columnDefinition = "TEXT")
+    private String resultadoIa;
+
+    @Column(name = "aprovado")
+    private Boolean aprovado;
+
+    @Column(name = "observacoes", length = 500)
+    private String observacoes;
+
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "categoria")
+    private AuditoriaCategoria categoria;
+
+    @ElementCollection
+    @CollectionTable(name = "audit_image_ids", joinColumns = @JoinColumn(name = "audit_id"))
+    @Column(name = "image_id", nullable = false)
+    private List<String> imageIds = new ArrayList<>();
+
+    @Column(name = "date_created", nullable = false, updatable = false)
+    private LocalDateTime dateCreated;
+
+    @Column(name = "date_updated")
+    private LocalDateTime dateUpdated;
+
+    @PrePersist
+    protected void onCreate() {
+        this.dateCreated = LocalDateTime.now();
+        this.dateUpdated = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.dateUpdated = LocalDateTime.now();
+    }
+}
