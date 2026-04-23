@@ -51,6 +51,15 @@ public class ReservaController {
         return ResponseEntity.noContent().build();
     }
 
+//    @DeleteMapping("/{id}/cancelar")
+//    public ResponseEntity<Void> cancelar(
+//            @PathVariable Long id,
+//            @RequestHeader("X-Usuario-Id") Long usuarioLogadoId) {
+//
+//        reservaService.cancelarReserva(id, usuarioLogadoId);
+//        return ResponseEntity.noContent().build();
+//    }
+
     @GetMapping("/usuario/{usuarioId}")
     public ResponseEntity<List<ReservaResponseDTO>> findByUsuario(@PathVariable Long usuarioId) {
         return ResponseEntity.ok(reservaService.findByUsuario(usuarioId));

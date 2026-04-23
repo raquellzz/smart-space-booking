@@ -35,4 +35,9 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
             "AND r.tipo <> 'MANUTENCAO' " +
             "ORDER BY r.createdAt DESC")
     List<Reserva> findReservasPorUsuario(@Param("usuarioId") Long usuarioId);
+
+    @Query("SELECT r FROM Reserva r WHERE r.status = 'CONFIRMADA' " +
+            "AND r.dataHoraCheckin IS NULL " +
+            "AND r.inicioDateTime <= :limiteTolerancia")
+    List<Reserva> findReservasPendentesExpiradas(@Param("limiteTolerancia") ZonedDateTime limiteTolerancia);
 }

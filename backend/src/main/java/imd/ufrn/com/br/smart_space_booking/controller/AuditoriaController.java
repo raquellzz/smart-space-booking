@@ -34,20 +34,22 @@ public class AuditoriaController {
     @PostMapping(value = "/checkin/{reservaId}", consumes = "multipart/form-data")
     public ResponseEntity<AuditoriaResponseDTO> checkIn(
             @PathVariable Long reservaId,
+            @RequestHeader("X-Usuario-Id") Long usuarioLogadoId,
             @RequestPart("imagens") List<MultipartFile> imagens,
             @RequestParam(value = "imageIds", required = false) List<String> imageIds) {
 
-        Auditoria auditoria = auditoriaService.realizarCheckIn(reservaId, imagens, imageIds);
+        Auditoria auditoria = auditoriaService.realizarCheckIn(reservaId, usuarioLogadoId, imagens, imageIds);
         return ResponseEntity.ok(AuditoriaResponseDTO.fromEntity(auditoria));
     }
 
-//    @PostMapping(value = "/checkout/{reservaId}", consumes = "multipart/form-data")
-//    public ResponseEntity<AuditoriaResponseDTO> checkOut(
-//            @PathVariable Long reservaId,
-//            @RequestPart("imagens") List<MultipartFile> imagens,
-//            @RequestParam(value = "imageIds", required = false) List<String> imageIds) {
-//
-//        Auditoria auditoria = auditoriaService.realizarCheckOut(reservaId, imagens, imageIds);
-//        return ResponseEntity.ok(AuditoriaResponseDTO.fromEntity(auditoria));
-//    }
+    @PostMapping(value = "/checkout/{reservaId}", consumes = "multipart/form-data")
+    public ResponseEntity<AuditoriaResponseDTO> checkOut(
+            @PathVariable Long reservaId,
+            @RequestHeader("X-Usuario-Id") Long usuarioLogadoId,
+            @RequestPart("imagens") List<MultipartFile> imagens,
+            @RequestParam(value = "imageIds", required = false) List<String> imageIds) {
+
+        Auditoria auditoria = auditoriaService.realizarCheckOut(reservaId,usuarioLogadoId, imagens, imageIds);
+        return ResponseEntity.ok(AuditoriaResponseDTO.fromEntity(auditoria));
+    }
 }

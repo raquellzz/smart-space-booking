@@ -15,6 +15,9 @@ public record ReservaResponseDTO(
         Long usuarioId,
         Long salaId,
         String salaNome,
+        ZonedDateTime dataHoraCheckin,
+        ZonedDateTime dataHoraCheckout,
+        String motivoCancelamento,
         ZonedDateTime createdAt,
         ZonedDateTime updatedAt
 ) {
@@ -28,6 +31,9 @@ public record ReservaResponseDTO(
                 reserva.getUsuario() != null ? reserva.getUsuario().getId() : null,
                 reserva.getSala().getId(),
                 reserva.getSala().getNome(),
+                reserva.getDataHoraCheckin(),
+                reserva.getDataHoraCheckout(),
+                reserva.getMotivoCancelamento(),
                 reserva.getCreatedAt(),
                 reserva.getUpdatedAt()
         );

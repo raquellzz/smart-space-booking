@@ -25,17 +25,20 @@ public class AuditoriaService {
     private final MediaStorageClient mediaStorageClient;
     private final AuditoriaRepository auditoriaRepository;
     private final ReservaRepository reservaRepository;
+    private final ReservaService reservaService;
     private final ObjectMapper objectMapper;
 
     public AuditoriaService(GeminiClient geminiClient,
                             MediaStorageClient mediaStorageClient,
                             AuditoriaRepository auditoriaRepository,
                             ReservaRepository reservaRepository,
+                            ReservaService reservaService,
                             ObjectMapper objectMapper) {
         this.geminiClient = geminiClient;
         this.mediaStorageClient = mediaStorageClient;
         this.auditoriaRepository = auditoriaRepository;
         this.reservaRepository = reservaRepository;
+        this.reservaService = reservaService;
         this.objectMapper = objectMapper;
     }
 
@@ -54,36 +57,35 @@ public class AuditoriaService {
     }
 
     @Transactional
-    public Auditoria realizarCheckIn(Long reservaId, List<MultipartFile> imagens, List<String> imageIds) {
+    public Auditoria realizarCheckIn(Long reservaId, Long usuarioLogadoId, List<MultipartFile> imagens, List<String> imageIds) {
+        reservaService.validarCheckin(reservaId, usuarioLogadoId);
         Reserva reserva = buscarReserva(reservaId);
-        validarStatus(reserva, ReservaStatus.CONFIRMADA, "Check-in só pode ser feito em reservas CONFIRMADAS.");
         validarAuditoriaInexistente(reservaId, AuditoriaTipo.CHECK_IN);
 
         List<byte[]> imagensReferencia = buscarImagensReferencia(reserva);
         String respostaTexto = geminiClient.analisar(AuditoriaPrompts.promptCheckIn(), imagensReferencia, imagens);
         AuditoriaResultadoDTO resultado = parsearResposta(respostaTexto);
 
-        reserva.setStatus(ReservaStatus.EM_ANDAMENTO);
-        reservaRepository.save(reserva);
+        reservaService.registrarCheckin(reservaId);
 
         return persistir(reserva, AuditoriaTipo.CHECK_IN, resultado, imageIds, respostaTexto);
     }
 
-//    @Transactional
-//    public Auditoria realizarCheckOut(Long reservaId, List<MultipartFile> imagens, List<String> imageIds) {
-//        Reserva reserva = buscarReserva(reservaId);
-//        validarStatus(reserva, ReservaStatus.EM_ANDAMENTO, "Check-out só pode ser feito em reservas EM_ANDAMENTO.");
-//        validarAuditoriaInexistente(reservaId, AuditoriaTipo.CHECK_OUT);
-//
-//        List<byte[]> imagensReferencia = buscarImagensReferencia(reserva);
-//        String respostaTexto = geminiClient.analisar(AuditoriaPrompts.promptCheckOut(), imagensReferencia, imagens);
-//        AuditoriaResultadoDTO resultado = parsearResposta(respostaTexto);
-//
-//        reserva.setStatus(ReservaStatus.ENCERRADA);
-//        reservaRepository.save(reserva);
-//
-//        return persistir(reserva, AuditoriaTipo.CHECK_OUT, resultado, imageIds, respostaTexto);
-//    }
+    @Transactional
+    public Auditoria realizarCheckOut(Long reservaId, Long usuarioLogadoId, List<MultipartFile> imagens, List<String> imageIds) {
+        reservaService.validarCheckout(reservaId, usuarioLogadoId); // ← valida dono + status
+
+        Reserva reserva = buscarReserva(reservaId);
+        validarAuditoriaInexistente(reservaId, AuditoriaTipo.CHECK_OUT);
+
+        List<byte[]> imagensReferencia = buscarImagensReferencia(reserva);
+        String respostaTexto = geminiClient.analisar(AuditoriaPrompts.promptCheckOut(), imagensReferencia, imagens);
+        AuditoriaResultadoDTO resultado = parsearResposta(respostaTexto);
+
+        reservaService.registrarCheckout(reservaId); // ← delega pro ReservaService
+
+        return persistir(reserva, AuditoriaTipo.CHECK_OUT, resultado, imageIds, respostaTexto);
+    }
 
     private List<byte[]> buscarImagensReferencia(Reserva reserva) {
         return reserva.getSala().getImagens().stream()

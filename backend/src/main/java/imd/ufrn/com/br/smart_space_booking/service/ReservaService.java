@@ -64,6 +64,9 @@ public class ReservaService {
         reserva.setStatus(ReservaStatus.CONFIRMADA);
         reserva.setUsuario(usuario);
         reserva.setSala(sala);
+        reserva.setDataHoraCheckin(null);
+        reserva.setDataHoraCheckout(null);
+        reserva.setMotivoCancelamento(null);
 
         reservaRepository.save(reserva);
 
@@ -79,6 +82,84 @@ public class ReservaService {
 
         return ReservaResponseDTO.fromEntity(reserva);
     }
+
+    @Transactional
+    public void validarCheckin(Long reservaId, Long usuarioLogadoId) {
+        Reserva reserva = reservaRepository.findById(reservaId)
+                .orElseThrow(() -> new ReservaNotFoundException("Reserva não encontrada"));
+
+        if (reserva.getUsuario() == null)
+            throw new RuntimeException("Erro interno: reserva sem usuário associado.");
+
+        if (!reserva.getUsuario().getId().equals(usuarioLogadoId))
+            throw new RegraNegocioException("Acesso negado: reserva de outro usuário.");
+
+        if (reserva.getStatus() == ReservaStatus.CANCELADA)
+            throw new RegraNegocioException("Não é possível fazer check-in de reserva cancelada.");
+
+        if (reserva.getDataHoraCheckin() != null)
+            throw new RegraNegocioException("Check-in já realizado para esta reserva.");
+
+        ZonedDateTime agora = ZonedDateTime.now();
+        ZonedDateTime inicio = reserva.getInicioDateTime();
+        ZonedDateTime limite = inicio.plusMinutes(10);
+
+        if (agora.isBefore(inicio))
+            throw new RegraNegocioException("O horário da reserva ainda não começou.");
+
+        if (agora.isAfter(limite)) {
+            reserva.setStatus(ReservaStatus.CANCELADA);
+            reserva.setMotivoCancelamento("NO_SHOW");
+            reservaRepository.save(reserva);
+            throw new RegraNegocioException("Tempo de check-in expirado. Reserva cancelada por No-Show.");
+        }
+    }
+
+    @Transactional
+    public void registrarCheckin(Long reservaId) {
+        Reserva reserva = reservaRepository.findById(reservaId).orElseThrow();
+        reserva.setDataHoraCheckin(ZonedDateTime.now());
+        reserva.setStatus(ReservaStatus.EM_ANDAMENTO);
+        reservaRepository.save(reserva);
+    }
+
+    public void validarCheckout(Long reservaId, Long usuarioLogadoId) {
+        Reserva reserva = reservaRepository.findById(reservaId)
+                .orElseThrow(() -> new ReservaNotFoundException("Reserva não encontrada"));
+
+        if (!reserva.getUsuario().getId().equals(usuarioLogadoId))
+            throw new RegraNegocioException("Acesso negado: reserva de outro usuário.");
+
+        if (reserva.getStatus() != ReservaStatus.EM_ANDAMENTO)
+            throw new RegraNegocioException("Check-out só pode ser feito em reservas EM_ANDAMENTO.");
+
+        if (reserva.getDataHoraCheckout() != null)
+            throw new RegraNegocioException("Check-out já realizado para esta reserva.");
+    }
+
+    @Transactional
+    public void registrarCheckout(Long reservaId) {
+        Reserva reserva = reservaRepository.findById(reservaId).orElseThrow();
+        reserva.setDataHoraCheckout(ZonedDateTime.now());
+        reserva.setStatus(ReservaStatus.ENCERRADA);
+        reservaRepository.save(reserva);
+    }
+
+//    @Transactional
+//    public void cancelarReserva(Long reservaId, Long usuarioLogadoId) {
+//        Reserva reserva = reservaRepository.findById(reservaId)
+//                .orElseThrow(() -> new ReservaNotFoundException("Reserva não encontrada com o ID: " + reservaId));
+//
+//        if (!reserva.getUsuario().getId().equals(usuarioLogadoId))
+//            throw new RegraNegocioException("Acesso negado: você não pode cancelar a reserva de outro usuário.");
+//
+//        if (reserva.getStatus() != ReservaStatus.CONFIRMADA)
+//            throw new RegraNegocioException("Só é possível cancelar reservas com status CONFIRMADA.");
+//
+//        reserva.setStatus(ReservaStatus.CANCELADA);
+//        reserva.setMotivoCancelamento("CANCELADO MANUALMENTE");
+//        reservaRepository.save(reserva);
+//    }
 
     public List<HorarioOcupadoDTO> findOcupados(Long salaId, LocalDate data) {
         ZonedDateTime inicioDia = data.atStartOfDay(ZoneId.of("America/Fortaleza"));

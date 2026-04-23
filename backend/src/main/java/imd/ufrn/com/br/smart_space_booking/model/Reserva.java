@@ -35,6 +35,15 @@ public class Reserva {
     @Column(nullable = false)
     private ReservaTipo tipo;
 
+    @Column(name = "data_hora_checkin")
+    private ZonedDateTime dataHoraCheckin;
+
+    @Column(name = "data_hora_checkout")
+    private ZonedDateTime dataHoraCheckout;
+
+    @Column(name = "motivo_cancelamento")
+    private String motivoCancelamento;
+
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private ZonedDateTime createdAt;
