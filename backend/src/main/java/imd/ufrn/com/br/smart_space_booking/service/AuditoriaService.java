@@ -7,6 +7,7 @@ import imd.ufrn.com.br.smart_space_booking.dto.AuditoriaResponseDTO;
 import imd.ufrn.com.br.smart_space_booking.dto.AuditoriaResultadoDTO;
 import imd.ufrn.com.br.smart_space_booking.enums.AuditoriaTipo;
 import imd.ufrn.com.br.smart_space_booking.enums.ReservaStatus;
+import imd.ufrn.com.br.smart_space_booking.exception.ImagemInvalidaException;
 import imd.ufrn.com.br.smart_space_booking.model.Auditoria;
 import imd.ufrn.com.br.smart_space_booking.model.Reserva;
 import imd.ufrn.com.br.smart_space_booking.prompts.AuditoriaPrompts;
@@ -64,7 +65,9 @@ public class AuditoriaService {
 
         List<byte[]> imagensReferencia = buscarImagensReferencia(reserva);
         String respostaTexto = geminiClient.analisar(AuditoriaPrompts.promptCheckIn(), imagensReferencia, imagens);
+
         AuditoriaResultadoDTO resultado = parsearResposta(respostaTexto);
+        validarImagemValida(resultado, imageIds);
 
         reservaService.registrarCheckin(reservaId);
 
@@ -80,7 +83,9 @@ public class AuditoriaService {
 
         List<byte[]> imagensReferencia = buscarImagensReferencia(reserva);
         String respostaTexto = geminiClient.analisar(AuditoriaPrompts.promptCheckOut(), imagensReferencia, imagens);
+
         AuditoriaResultadoDTO resultado = parsearResposta(respostaTexto);
+        validarImagemValida(resultado, imageIds);
 
         reservaService.registrarCheckout(reservaId); // ← delega pro ReservaService
 
@@ -139,6 +144,24 @@ public class AuditoriaService {
                 .isPresent();
         if (jaExiste) {
             throw new RuntimeException(tipo + " já realizado para a reserva: " + reservaId);
+        }
+    }
+
+    private void validarImagemValida(AuditoriaResultadoDTO resultado, List<String> imageIds) {
+        if (!resultado.isImagemValida()) {
+            if (imageIds != null) {
+                imageIds.forEach(id -> {
+                    try {
+                        mediaStorageClient.deletarImagem(id);
+                    } catch (Exception e) {
+
+                    }
+                });
+            }
+            throw new ImagemInvalidaException(
+                    "As imagens enviadas não correspondem a um ambiente interno. " +
+                            "Por favor, fotografe a sala corretamente."
+            );
         }
     }
 }

@@ -18,11 +18,19 @@ public class MediaStorageClient {
 
     /**
      * Busca os bytes de uma imagem no MS de mídia pelo ID.
-     * O endpoint do MS é: GET /v1/files/{id}
-     * O ID é armazenado como String na entidade mas o MS usa Long.
      */
     public byte[] buscarImagem(String imageId) {
         String url = mediaServerUrl + "/" + Long.parseLong(imageId);
         return restTemplate.getForObject(url, byte[].class);
+    }
+
+    /**
+     * Deleta uma imagem no MS de mídia pelo ID.
+     * Chamado quando a auditoria é rejeitada por imagem inválida,
+     * para não deixar arquivos órfãos no MS.
+     */
+    public void deletarImagem(String imageId) {
+        String url = mediaServerUrl + "/" + Long.parseLong(imageId);
+        restTemplate.delete(url);
     }
 }

@@ -12,6 +12,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
     @Query("SELECT r FROM Reserva r WHERE r.sala.id = :salaId " +
             "AND r.inicioDateTime >= :inicioDia AND r.fimDateTime <= :fimDia " +
+            "AND r.status <> 'CANCELADA' " +
             "ORDER BY r.inicioDateTime ASC")
     List<Reserva> findReservasPorSalaNoDia(
             @Param("salaId") Long salaId,
@@ -21,7 +22,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     @Query("""
         SELECT COUNT(r) > 0 FROM Reserva r
         WHERE r.sala.id = :salaId
-        AND r.status <> 'CANCELLED'
+        AND r.status <> 'CANCELADA'
         AND r.inicioDateTime < :fim
         AND r.fimDateTime > :inicio
     """)

@@ -15,16 +15,26 @@ public class AuditoriaPrompts {
             As PRIMEIRAS imagens mostram o estado PADRÃO esperado da sala (cadastrado no sistema).
             As imagens SEGUINTES mostram o estado ATUAL da sala, fotografado agora pelo usuário.
 
-            Avalie se o estado atual está em condições ADEQUADAS para receber um usuário,
-            comparando com o padrão esperado: organização, limpeza e integridade dos itens.
-
-            Responda SOMENTE com um JSON válido, sem texto adicional:
+            ANTES de avaliar, verifique se as imagens enviadas pelo usuário mostram claramente
+            um ambiente interno (sala, escritório ou espaço de trabalho).
+            Se alguma imagem claramente não for de um ambiente interno, responda APENAS:
             {
+              "imagemValida": false,
+              "aprovado": false,
+              "observacoes": "As imagens enviadas não correspondem a um ambiente interno."
+            }
+
+            Se as imagens forem válidas, avalie se o estado atual está em condições ADEQUADAS
+            para receber um usuário, comparando com o padrão esperado: organização, limpeza
+            e integridade dos itens. Responda SOMENTE com um JSON válido, sem texto adicional:
+            {
+              "imagemValida": true,
               "aprovado": true,
               "observacoes": "Descreva brevemente o estado atual em relação ao padrão em até 200 caracteres."
             }
 
             Regras:
+            - "imagemValida": false se as imagens do usuário não forem de um ambiente interno.
             - "aprovado": true se o estado atual está condizente com o padrão esperado, false caso contrário.
             - "observacoes": destaque diferenças relevantes em relação ao padrão, se houver.
             """;
@@ -35,20 +45,32 @@ public class AuditoriaPrompts {
             As PRIMEIRAS imagens mostram o estado PADRÃO esperado da sala (cadastrado no sistema).
             As imagens SEGUINTES mostram o estado ATUAL da sala APÓS o uso do usuário.
 
-            Avalie o estado geral comparando com o padrão: limpeza, organização,
-            integridade dos itens e possíveis danos.
+            ANTES de avaliar, verifique se as imagens enviadas pelo usuário mostram claramente
+            um ambiente interno (sala, escritório ou espaço de trabalho).
+            Se alguma imagem claramente não for de um ambiente interno, responda APENAS:
+            {
+              "imagemValida": false,
+              "aprovado": false,
+              "observacoes": "As imagens enviadas não correspondem a um ambiente interno.",
+              "categoria": "NAO_IDENTIFICADO"
+            }
+
+            Se as imagens forem válidas, avalie o estado geral comparando com o padrão:
+            limpeza, organização, integridade dos itens e possíveis danos.
 
             Classifique o resultado em UMA das seguintes categorias (use exatamente este nome):
             %s
 
             Responda SOMENTE com um JSON válido, sem texto adicional:
             {
+              "imagemValida": true,
               "aprovado": true,
               "observacoes": "Descreva o estado em relação ao padrão em até 200 caracteres.",
               "categoria": "NOME_DA_CATEGORIA"
             }
 
             Regras:
+            - "imagemValida": false se as imagens do usuário não forem de um ambiente interno.
             - "aprovado": true para resultados neutros ou positivos, false para negativos (dano, sujeira, item faltando).
             - "observacoes": destaque o que mudou em relação ao padrão esperado.
             - "categoria": escolha APENAS uma das categorias listadas acima, com o nome exato.

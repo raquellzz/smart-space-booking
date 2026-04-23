@@ -32,4 +32,9 @@ public class ReservaExceptionHandler {
     public ResponseEntity<String> handleException(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno: " + ex.getMessage());
     }
+
+    @ExceptionHandler(ImagemInvalidaException.class)
+    public ResponseEntity<String> handleImagemInvalidaException(ImagemInvalidaException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
 }

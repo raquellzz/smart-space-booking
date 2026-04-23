@@ -98,7 +98,7 @@ public class ReservaService {
         if (reserva.getStatus() == ReservaStatus.CANCELADA)
             throw new RegraNegocioException("Não é possível fazer check-in de reserva cancelada.");
 
-        if (reserva.getDataHoraCheckin() != null)
+        if (reserva.getDataHoraCheckin() != null && reserva.getStatus() == ReservaStatus.EM_ANDAMENTO)
             throw new RegraNegocioException("Check-in já realizado para esta reserva.");
 
         ZonedDateTime agora = ZonedDateTime.now();
