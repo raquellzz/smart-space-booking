@@ -10,25 +10,33 @@ public class AuditoriaPrompts {
     private AuditoriaPrompts() {}
 
     private static final String PROMPT_CHECKIN = """
-            Você é um auditor de espaços corporativos. Analise as imagens de uma sala e avalie
-            se ela está em condições ADEQUADAS para receber um usuário: organizada, limpa e sem danos visíveis.
-            Considere todas as imagens enviadas para formar sua avaliação.
+            Você é um auditor de espaços corporativos.
+
+            As PRIMEIRAS imagens mostram o estado PADRÃO esperado da sala (cadastrado no sistema).
+            As imagens SEGUINTES mostram o estado ATUAL da sala, fotografado agora pelo usuário.
+
+            Avalie se o estado atual está em condições ADEQUADAS para receber um usuário,
+            comparando com o padrão esperado: organização, limpeza e integridade dos itens.
 
             Responda SOMENTE com um JSON válido, sem texto adicional:
             {
               "aprovado": true,
-              "observacoes": "Descreva brevemente o estado atual da sala em até 200 caracteres."
+              "observacoes": "Descreva brevemente o estado atual em relação ao padrão em até 200 caracteres."
             }
 
             Regras:
-            - "aprovado": true se a sala está em condições aceitáveis para uso, false caso contrário.
-            - "observacoes": descreva o que foi observado de forma objetiva.
+            - "aprovado": true se o estado atual está condizente com o padrão esperado, false caso contrário.
+            - "observacoes": destaque diferenças relevantes em relação ao padrão, se houver.
             """;
 
     private static final String PROMPT_CHECKOUT_TEMPLATE = """
-            Você é um auditor de espaços corporativos. Analise as imagens de uma sala APÓS o uso de um usuário
-            e avalie o estado geral do ambiente: limpeza, organização, integridade dos itens e possíveis danos.
-            Considere todas as imagens enviadas para formar sua avaliação.
+            Você é um auditor de espaços corporativos.
+
+            As PRIMEIRAS imagens mostram o estado PADRÃO esperado da sala (cadastrado no sistema).
+            As imagens SEGUINTES mostram o estado ATUAL da sala APÓS o uso do usuário.
+
+            Avalie o estado geral comparando com o padrão: limpeza, organização,
+            integridade dos itens e possíveis danos.
 
             Classifique o resultado em UMA das seguintes categorias (use exatamente este nome):
             %s
@@ -36,13 +44,13 @@ public class AuditoriaPrompts {
             Responda SOMENTE com um JSON válido, sem texto adicional:
             {
               "aprovado": true,
-              "observacoes": "Descreva o estado da sala em até 200 caracteres.",
+              "observacoes": "Descreva o estado em relação ao padrão em até 200 caracteres.",
               "categoria": "NOME_DA_CATEGORIA"
             }
 
             Regras:
             - "aprovado": true para resultados neutros ou positivos, false para negativos (dano, sujeira, item faltando).
-            - "observacoes": descreva objetivamente o que motivou a classificação.
+            - "observacoes": destaque o que mudou em relação ao padrão esperado.
             - "categoria": escolha APENAS uma das categorias listadas acima, com o nome exato.
             """;
 

@@ -1,120 +1,173 @@
-import { useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { getReservasUsuario } from '../../services/api';
-import { AuthContext } from '../../contexts/AuthContext';
-import './Perfil.css';
+import { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../contexts/AuthContext";
+import { getReservasUsuario, uploadArquivo } from "../../services/api";
+import ModalAuditoria from "../Perfil/components/ModalAuditoria";
+import "./Perfil.css";
 
 function Perfil() {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
-  
-  const [historicoReservas, setHistoricoReservas] = useState([]);
+
+  const [reservas, setReservas] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [modalAberto, setModalAberto] = useState(null); // { reserva, tipo }
+  const [processando, setProcessando] = useState(false);
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   useEffect(() => {
-    async function carregarMinhasReservas() {
-      if (!user?.id) {
-        console.log("ID do usuário não disponível. Verifique o estado de autenticação.");
-        setLoading(false);
-        return;
-      }
-      try {
-        console.log("Buscando reservas para o usuário ID:", user.id);
-        const response = await getReservasUsuario(user?.id);
-        console.log("Reservas que vieram do Banco:", response.data);
-        
-        const reservasFormatadas = response.data.map((r) => {
-          
-          const campoInicio = r.inicioDateTime; 
-          const campoFim = r.fimDateTime;
-
-          const dataInicio = new Date(campoInicio);
-          const dataFim = new Date(campoFim);
-
-          let dataFormatada = dataInicio.toLocaleDateString('pt-BR', {
-            day: '2-digit', month: 'short', year: 'numeric'
-          }).replace(' de ', ' ').replace('.', '');
-          
-          const horaInicio = dataInicio.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-          const horaFim = dataFim.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-
-          let statusVisual = r.status;
-          if (r.status === 'CONFIRMADA') statusVisual = 'FAZER CHECK-IN';
-          if (r.status === 'ENCERRADA') statusVisual = 'CONCLUÍDA';
-
-          return {
-            id: r.id,
-            sala: `Sala ${r.salaNome}` || `Sala #${r.salaId}`, 
-            data: dataFormatada,
-            horario: `${horaInicio} - ${horaFim}`,
-            status: statusVisual
-          };
-        });
-
-        setHistoricoReservas(reservasFormatadas);
-
-      } catch (error) {
-        console.error("Erro ao buscar histórico:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    carregarMinhasReservas();
+    carregarReservas();
   }, [user]);
 
-  const getStatusClass = (status) => {
-    switch (status) {
-      case 'FAZER CHECK-IN': return 'status-checkin';
-      case 'CONCLUÍDA': return 'status-concluida';
-      case 'CANCELADA': return 'status-cancelada';
-      default: return '';
+  async function carregarReservas() {
+    if (!user?.id) {
+      setLoading(false);
+      return;
     }
-  };
+    try {
+      const response = await getReservasUsuario(user.id);
+      setReservas(response.data.map(formatar));
+    } catch (error) {
+      console.error("Erro ao buscar reservas:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function formatar(r) {
+    const dataInicio = new Date(r.inicioDateTime);
+    const dataFim = new Date(r.fimDateTime);
+
+    const dataFormatada = dataInicio
+      .toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+      .replace(" de ", " ")
+      .replace(".", "");
+
+    const horaInicio = dataInicio.toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    const horaFim = dataFim.toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    return {
+      id: r.id,
+      sala: r.salaNome ? `Sala ${r.salaNome}` : `Sala #${r.salaId}`,
+      data: dataFormatada,
+      horario: `${horaInicio} - ${horaFim}`,
+      status: r.status,
+    };
+  }
+
+  async function handleConfirmarAuditoria(arquivos) {
+    setProcessando(true);
+    try {
+      const imageIds = await Promise.all(
+        arquivos.map(async (arquivo) => {
+          const resposta = await uploadArquivo(arquivo);
+          return String(resposta.data.id);
+        }),
+      );
+
+      const formData = new FormData();
+      arquivos.forEach((arquivo) => formData.append("imagens", arquivo));
+      imageIds.forEach((id) => formData.append("imageIds", id));
+
+      setModalAberto(null);
+      await carregarReservas();
+    } catch (error) {
+      console.error("Erro na auditoria:", error);
+      setModalAberto(null);
+    } finally {
+      setProcessando(false);
+    }
+  }
+
+  function getStatusClass(status) {
+    switch (status) {
+      case "CONFIRMADA":
+        return "status-checkin";
+      case "EM_ANDAMENTO":
+        return "status-andamento";
+      case "ENCERRADA":
+        return "status-concluida";
+      case "CANCELADA":
+        return "status-cancelada";
+      default:
+        return "";
+    }
+  }
+
+  function getLabelStatus(status) {
+    switch (status) {
+      case "CONFIRMADA":
+        return "FAZER CHECK-IN";
+      case "EM_ANDAMENTO":
+        return "FAZER CHECK-OUT";
+      case "ENCERRADA":
+        return "CONCLUÍDA";
+      case "CANCELADA":
+        return "CANCELADA";
+      default:
+        return status;
+    }
+  }
+
+  const isAcaoAtiva = (status) =>
+    status === "CONFIRMADA" || status === "EM_ANDAMENTO";
 
   return (
     <div className="perfil-container">
       <main className="perfil-content">
         <h1 className="page-title">Perfil</h1>
 
-        {/* Card principal do usuário */}
         <section className="user-card">
           <div className="user-details">
-            <h2 className="user-name">{user?.nome || 'Usuário Desconhecido'}</h2>
-            <p className="user-email">{user?.email || 'email@ssb-corp.com'}</p>
-            
+            <h2 className="user-name">
+              {user?.nome || "Usuário Desconhecido"}
+            </h2>
+            <p className="user-email">{user?.email || "email@ssb-corp.com"}</p>
             <div className="trust-score-badge">
               <span className="score-label">TRUST SCORE:</span>
-              <span className="score-value">★ {user?.trustScore || 100}/100</span>
+              <span className="score-value">
+                ★ {user?.trustScore || 100}/100
+              </span>
             </div>
           </div>
-          
           <button className="logout-button" onClick={handleLogout}>
             🚪 Sair da Conta
           </button>
         </section>
 
-        {/* Histórico de reservas */}
         <section className="history-section">
           <div className="history-header">
-            <h2>Histórico de Reservas</h2>
+            <h2>Minhas Reservas</h2>
             <p>Gerencie suas utilizações de espaços de trabalho.</p>
           </div>
 
           {loading ? (
-            <p style={{ color: '#666' }}>Carregando seu histórico de reservas...</p>
-          ) : historicoReservas.length === 0 ? (
-            <p style={{ color: '#666' }}>Você ainda não possui reservas registradas.</p>
+            <p style={{ color: "#666" }}>Carregando reservas...</p>
+          ) : reservas.length === 0 ? (
+            <p style={{ color: "#666" }}>
+              Você ainda não possui reservas registradas.
+            </p>
           ) : (
             <div className="reservations-list">
-              {historicoReservas.map((reserva) => (
-                <div key={reserva.id} className={`reservation-card ${getStatusClass(reserva.status)}`}>
+              {reservas.map((reserva) => (
+                <div
+                  key={reserva.id}
+                  className={`reservation-card ${getStatusClass(reserva.status)}`}
+                >
                   <div className="reservation-info">
                     <h3>{reserva.sala}</h3>
                     <div className="reservation-datetime">
@@ -122,14 +175,25 @@ function Perfil() {
                       <span>🕒 {reserva.horario}</span>
                     </div>
                   </div>
-                  
-                  {reserva.status === 'FAZER CHECK-IN' ? (
-                    <button className="badge checkin-btn">
-                      {reserva.status} &gt;
+
+                  {isAcaoAtiva(reserva.status) ? (
+                    <button
+                      className={`badge ${getStatusClass(reserva.status)}-btn`}
+                      onClick={() =>
+                        setModalAberto({
+                          reserva,
+                          tipo:
+                            reserva.status === "CONFIRMADA"
+                              ? "checkin"
+                              : "checkout",
+                        })
+                      }
+                    >
+                      {getLabelStatus(reserva.status)} &gt;
                     </button>
                   ) : (
                     <span className={`badge ${getStatusClass(reserva.status)}`}>
-                      {reserva.status}
+                      {getLabelStatus(reserva.status)}
                     </span>
                   )}
                 </div>
@@ -138,6 +202,17 @@ function Perfil() {
           )}
         </section>
       </main>
+
+      {/* Modal de auditoria */}
+      {modalAberto && (
+        <ModalAuditoria
+          tipo={modalAberto.tipo}
+          reserva={modalAberto.reserva}
+          onConfirmar={handleConfirmarAuditoria}
+          onFechar={() => !processando && setModalAberto(null)}
+          processando={processando}
+        />
+      )}
     </div>
   );
 }
