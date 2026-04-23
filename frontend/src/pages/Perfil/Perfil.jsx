@@ -47,12 +47,26 @@ function Perfil() {
           let statusVisual = r.status;
           let precisaDeCheckin = false;
           if (r.status === 'CONFIRMADA') {
-            if (r.fotoCheckinId || r.dataHoraCheckin) {
-              statusVisual = 'CHECK-IN REALIZADO';
+            const agora = new Date();
+
+            if (agora < dataInicio) {
+              // Antes do horário → pode cancelar
+              statusVisual = 'CANCELAR RESERVA';
+
+            } else if (agora >= dataInicio && agora <= dataFim) {
+              // Durante o horário → checar se já fez check-in
+              if (r.fotoCheckinId || r.dataHoraCheckin) {
+                statusVisual = 'FAZER CHECKOUT';
+              } /*else if (r.fotoCheckout || r.dataHoraCheckout) {
+                statusVisual = 'CONCLUÍDA';
+              }*/ else {
+                statusVisual = 'FAZER CHECK-IN';
+              } 
+
             } else {
-              statusVisual = 'FAZER CHECK-IN';
-              precisaDeCheckin = true;
+              statusVisual = 'EXPIRADA';
             }
+
           } else if (r.status === 'ENCERRADA') {
             statusVisual = 'CONCLUÍDA';
           }
@@ -62,7 +76,9 @@ function Perfil() {
             sala: `Sala ${r.salaNome}` || `Sala #${r.salaId}`, 
             data: dataFormatada,
             horario: `${horaInicio} - ${horaFim}`,
-            status: statusVisual
+            status: statusVisual,
+            dataInicio,
+            dataFim,
           };
         });
 
@@ -79,15 +95,33 @@ function Perfil() {
   }, [user]);
 
   const getStatusClass = (status) => {
-    switch (status) {
-      case 'FAZER CHECK-IN': return 'status-checkin';
-      case 'CONCLUÍDA': return 'status-concluida';
-      case 'CANCELADA': return 'status-cancelada';
-      default: return '';
-    }
-  };
+  switch (status) {
+    case 'FAZER CHECK-IN':   return 'status-checkin';
+    case 'FAZER CHECKOUT':   return 'status-checkout';  
+    case 'CANCELAR RESERVA': return 'status-cancelar'; 
+    case 'CONCLUÍDA':        return 'status-concluida';
+    case 'CANCELADA':        return 'status-cancelada';
+    case 'EXPIRADA':         return 'status-cancelada';
+    default: return '';
+  }
+};
+
   const irParaCheckin = (id) => {
     navigate(`/checkin/${id}`);
+  };
+
+  const irParaCheckout = (id) => {
+    navigate(`/checkout/${id}`);
+  };
+
+  const cancelarReserva = async (id) => {
+    if (!window.confirm('Tem certeza que deseja cancelar esta reserva?')) return;
+    try {
+      await cancelarReservaApi(id); // add
+      setHistoricoReservas(prev => prev.filter(r => r.id !== id));
+    } catch (error) {
+      alert('Erro ao cancelar a reserva. Tente novamente.');
+    }
   };
 
   return (
@@ -135,10 +169,15 @@ function Perfil() {
                     </div>
                   </div>
                   
-                  {reserva.status === 'FAZER CHECK-IN' ? (
-                    <button 
-                      className="badge checkin-btn"
-                      onClick={() => irParaCheckin(reserva.id)}>
+                  {['FAZER CHECK-IN', 'FAZER CHECKOUT', 'CANCELAR RESERVA'].includes(reserva.status) ? (
+                    <button
+                      className={`badge ${getStatusClass(reserva.status)}`}
+                      onClick={() => {
+                        if (reserva.status === 'FAZER CHECK-IN')   irParaCheckin(reserva.id);
+                        if (reserva.status === 'FAZER CHECKOUT')   irParaCheckout(reserva.id);
+                        if (reserva.status === 'CANCELAR RESERVA') /*cancelarReserva(reserva.id)*/; // add dps
+                      }}
+                    >
                       {reserva.status} &gt;
                     </button>
                   ) : (

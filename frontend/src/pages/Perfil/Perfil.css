@@ -160,26 +160,41 @@
 }
 
 /* STATUS COLORS & BADGES */
-.reservation-card.status-checkin { border-left-color: #1976d2; }
-.reservation-card.status-concluida { border-left-color: #9e9e9e; }
-.reservation-card.status-cancelada { border-left-color: #d32f2f; }
+.reservation-card.status-checkin    { border-left-color: #1976d2; }
+.reservation-card.status-checkout   { border-left-color: var(--primary-color); }
+.reservation-card.status-cancelar   { border-left-color: black; }
+.reservation-card.status-concluida  { border-left-color: #9e9e9e; }
+.reservation-card.status-cancelada  { border-left-color: #d32f2f; }
 
 .badge {
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: bold;
-}
-
-.checkin-btn {
-  background-color: #e3f2fd;
-  color: #1976d2;
   border: none;
-  cursor: pointer;
-  transition: background-color 0.2s;
+  cursor: default;
 }
 
-.checkin-btn:hover { background-color: #bbdefb; }
+/* Botões de ação (clicáveis) */
+button.badge {
+  cursor: pointer;
+  transition: background-color 0.2s, opacity 0.2s;
+}
+button.badge:hover { opacity: 0.85; }
 
+/* Check-in */
+button.badge.status-checkin { background-color: #e3f2fd; color: #1976d2; }
+button.badge.status-checkin:hover { background-color: #bbdefb; }
+
+/* Checkout */
+button.badge.status-checkout { background-color: #e8eaf6; color: var(--primary-color); }
+button.badge.status-checkout:hover { background-color: #c9d1ff; }
+
+/* Cancelar reserva */
+button.badge.status-cancelar { background-color: #dadada; color: black; }
+button.badge.status-cancelar:hover { background-color: #afafaf; }
+
+/* Badges estáticos */
 span.badge.status-concluida { background-color: #f5f5f5; color: #757575; }
 span.badge.status-cancelada { background-color: #ffebee; color: #c62828; }
+span.badge.status-expirada  { background-color: #ffebee; color: #c62828; }

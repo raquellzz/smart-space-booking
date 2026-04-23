@@ -10,7 +10,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AcessoNegado from "./pages/AcessoNegado/AcessoNegado";
 import Perfil from "./pages/Perfil/Perfil";
 import Layout from "./components/Layout";
-import CheckinReserva from "./pages/CheckinReserva/CheckinReserva";
+import CheckinReserva from "./pages/CheckinCheckoutReserva/CheckinReserva";
+import CheckoutReserva from "./pages/CheckinCheckoutReserva/CheckoutReserva";
 
 function App() {
   return (
@@ -45,6 +46,14 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
                   <CheckinReserva />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/checkout/:id"
+              element={
+                <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
+                  <CheckoutReserva />
                 </ProtectedRoute>
               }
             />
