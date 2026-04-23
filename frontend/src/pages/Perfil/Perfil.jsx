@@ -1,8 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../contexts/AuthContext";
-import { getReservasUsuario, uploadArquivo } from "../../services/api";
-import ModalAuditoria from "../Perfil/components/ModalAuditoria";
+import { getReservasUsuario/*, cancelarReserva*/ } from "../../services/api";
 import "./Perfil.css";
 
 function Perfil() {
@@ -11,8 +10,6 @@ function Perfil() {
 
   const [reservas, setReservas] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [modalAberto, setModalAberto] = useState(null); // { reserva, tipo }
-  const [processando, setProcessando] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -41,6 +38,7 @@ function Perfil() {
   function formatar(r) {
     const dataInicio = new Date(r.inicioDateTime);
     const dataFim = new Date(r.fimDateTime);
+    const agora = new Date();
 
     const dataFormatada = dataInicio
       .toLocaleDateString("pt-BR", {
@@ -60,71 +58,69 @@ function Perfil() {
       minute: "2-digit",
     });
 
+    let statusVisual = r.status;
+
+    if (r.status === "CONFIRMADA") {
+      if (agora < dataInicio) {
+        statusVisual = "CANCELAR";
+      } else if (agora >= dataInicio && agora <= dataFim) {
+        statusVisual = "FAZER CHECK-IN";
+      } else {
+        statusVisual = "EXPIRADA";
+      }
+    } else if (r.status === "EM_ANDAMENTO") {
+      statusVisual = "FAZER CHECK-OUT";
+    } else if (r.status === "ENCERRADA") {
+      statusVisual = "CONCLUÍDA";
+    } else if (r.status === "CANCELADA") {
+      statusVisual = "CANCELADA";
+    }
+
     return {
       id: r.id,
       sala: r.salaNome ? `Sala ${r.salaNome}` : `Sala #${r.salaId}`,
       data: dataFormatada,
       horario: `${horaInicio} - ${horaFim}`,
       status: r.status,
+      statusVisual,
+      dataInicio,
+      dataFim,
     };
   }
 
-  async function handleConfirmarAuditoria(arquivos) {
-    setProcessando(true);
+  function getStatusClass(statusVisual) {
+    switch (statusVisual) {
+      case "FAZER CHECK-IN":  return "status-checkin";
+      case "FAZER CHECK-OUT": return "status-checkout";
+      case "CANCELAR":        return "status-cancelar";
+      case "CONCLUÍDA":       return "status-concluida";
+      case "CANCELADA":       return "status-cancelada";
+      case "EXPIRADA":        return "status-cancelada";
+      default:                return "";
+    }
+  }
+
+  async function cancelReserva(id) {
+    if (!window.confirm("Tem certeza que deseja cancelar esta reserva?")) return;
     try {
-      const imageIds = await Promise.all(
-        arquivos.map(async (arquivo) => {
-          const resposta = await uploadArquivo(arquivo);
-          return String(resposta.data.id);
-        }),
-      );
-
-      const formData = new FormData();
-      arquivos.forEach((arquivo) => formData.append("imagens", arquivo));
-      imageIds.forEach((id) => formData.append("imageIds", id));
-
-      setModalAberto(null);
+      //await cancelarReserva(id, user.id);
       await carregarReservas();
     } catch (error) {
-      console.error("Erro na auditoria:", error);
-      setModalAberto(null);
-    } finally {
-      setProcessando(false);
+      alert("Erro ao cancelar a reserva. Tente novamente.");
     }
   }
 
-  function getStatusClass(status) {
-    switch (status) {
-      case "CONFIRMADA":
-        return "status-checkin";
-      case "EM_ANDAMENTO":
-        return "status-andamento";
-      case "ENCERRADA":
-        return "status-concluida";
-      case "CANCELADA":
-        return "status-cancelada";
-      default:
-        return "";
+  function handleAcao(reserva) {
+    switch (reserva.statusVisual) {
+      case "FAZER CHECK-IN":  navigate(`/checkin/${reserva.id}`); break;
+      case "FAZER CHECK-OUT": navigate(`/checkout/${reserva.id}`); break;
+      case "CANCELAR":        cancelReserva(reserva.id); break;
+      default: break;
     }
   }
 
-  function getLabelStatus(status) {
-    switch (status) {
-      case "CONFIRMADA":
-        return "FAZER CHECK-IN";
-      case "EM_ANDAMENTO":
-        return "FAZER CHECK-OUT";
-      case "ENCERRADA":
-        return "CONCLUÍDA";
-      case "CANCELADA":
-        return "CANCELADA";
-      default:
-        return status;
-    }
-  }
-
-  const isAcaoAtiva = (status) =>
-    status === "CONFIRMADA" || status === "EM_ANDAMENTO";
+  const isAcaoAtiva = (statusVisual) =>
+    ["FAZER CHECK-IN", "FAZER CHECK-OUT", "CANCELAR"].includes(statusVisual);
 
   return (
     <div className="perfil-container">
@@ -133,15 +129,11 @@ function Perfil() {
 
         <section className="user-card">
           <div className="user-details">
-            <h2 className="user-name">
-              {user?.nome || "Usuário Desconhecido"}
-            </h2>
+            <h2 className="user-name">{user?.nome || "Usuário Desconhecido"}</h2>
             <p className="user-email">{user?.email || "email@ssb-corp.com"}</p>
             <div className="trust-score-badge">
               <span className="score-label">TRUST SCORE:</span>
-              <span className="score-value">
-                ★ {user?.trustScore || 100}/100
-              </span>
+              <span className="score-value">★ {user?.trustScore || 100}/100</span>
             </div>
           </div>
           <button className="logout-button" onClick={handleLogout}>
@@ -158,15 +150,13 @@ function Perfil() {
           {loading ? (
             <p style={{ color: "#666" }}>Carregando reservas...</p>
           ) : reservas.length === 0 ? (
-            <p style={{ color: "#666" }}>
-              Você ainda não possui reservas registradas.
-            </p>
+            <p style={{ color: "#666" }}>Você ainda não possui reservas registradas.</p>
           ) : (
             <div className="reservations-list">
               {reservas.map((reserva) => (
                 <div
                   key={reserva.id}
-                  className={`reservation-card ${getStatusClass(reserva.status)}`}
+                  className={`reservation-card ${getStatusClass(reserva.statusVisual)}`}
                 >
                   <div className="reservation-info">
                     <h3>{reserva.sala}</h3>
@@ -176,24 +166,16 @@ function Perfil() {
                     </div>
                   </div>
 
-                  {isAcaoAtiva(reserva.status) ? (
+                  {isAcaoAtiva(reserva.statusVisual) ? (
                     <button
-                      className={`badge ${getStatusClass(reserva.status)}-btn`}
-                      onClick={() =>
-                        setModalAberto({
-                          reserva,
-                          tipo:
-                            reserva.status === "CONFIRMADA"
-                              ? "checkin"
-                              : "checkout",
-                        })
-                      }
+                      className={`badge ${getStatusClass(reserva.statusVisual)}`}
+                      onClick={() => handleAcao(reserva)}
                     >
-                      {getLabelStatus(reserva.status)} &gt;
+                      {reserva.statusVisual} &gt;
                     </button>
                   ) : (
-                    <span className={`badge ${getStatusClass(reserva.status)}`}>
-                      {getLabelStatus(reserva.status)}
+                    <span className={`badge ${getStatusClass(reserva.statusVisual)}`}>
+                      {reserva.statusVisual}
                     </span>
                   )}
                 </div>
@@ -202,17 +184,6 @@ function Perfil() {
           )}
         </section>
       </main>
-
-      {/* Modal de auditoria */}
-      {modalAberto && (
-        <ModalAuditoria
-          tipo={modalAberto.tipo}
-          reserva={modalAberto.reserva}
-          onConfirmar={handleConfirmarAuditoria}
-          onFechar={() => !processando && setModalAberto(null)}
-          processando={processando}
-        />
-      )}
     </div>
   );
 }

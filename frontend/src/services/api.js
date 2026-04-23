@@ -24,15 +24,28 @@ export const getHorariosOcupados = (salaId, data) =>
     params: { salaId, data },
   });
 
-export const fazerCheckIn = (reservaId, formData) =>
-  api.post(`/auditorias/checkin/${reservaId}`, formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
+  // export const cancelarReserva = (reservaId, usuarioId) =>
+  // api.delete(`/reservas/${reservaId}/cancelar`, {
+  //   headers: { "X-Usuario-Id": usuarioId },
+  // });
 
-export const fazerCheckOut = (reservaId, formData) =>
-  api.post(`/auditorias/checkout/${reservaId}`, formData, {
-    headers: { "Content-Type": "multipart/form-data" },
+export const fazerCheckIn = (reservaId, usuarioId, arquivos) => {
+  const formData = new FormData();
+  arquivos.forEach((arquivo) => formData.append("imagens", arquivo));
+
+  return api.post(`/auditorias/checkin/${reservaId}`, formData, {
+    headers: { "Content-Type": "multipart/form-data", "X-Usuario-Id": usuarioId },
   });
+};
+
+export const fazerCheckOut = (reservaId, usuarioId, arquivos) => {
+  const formData = new FormData();
+  arquivos.forEach((arquivo) => formData.append("imagens", arquivo));
+
+  return api.post(`/auditorias/checkout/${reservaId}`, formData, {
+    headers: { "Content-Type": "multipart/form-data", "X-Usuario-Id": usuarioId },
+  });
+};
 
 export const uploadArquivo = (arquivo) => {
   const formData = new FormData();
