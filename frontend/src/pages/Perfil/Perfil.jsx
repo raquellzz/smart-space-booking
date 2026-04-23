@@ -45,8 +45,17 @@ function Perfil() {
           const horaFim = dataFim.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
           let statusVisual = r.status;
-          if (r.status === 'CONFIRMADA') statusVisual = 'FAZER CHECK-IN';
-          if (r.status === 'ENCERRADA') statusVisual = 'CONCLUÍDA';
+          let precisaDeCheckin = false;
+          if (r.status === 'CONFIRMADA') {
+            if (r.fotoCheckinId || r.dataHoraCheckin) {
+              statusVisual = 'CHECK-IN REALIZADO';
+            } else {
+              statusVisual = 'FAZER CHECK-IN';
+              precisaDeCheckin = true;
+            }
+          } else if (r.status === 'ENCERRADA') {
+            statusVisual = 'CONCLUÍDA';
+          }
 
           return {
             id: r.id,
@@ -76,6 +85,9 @@ function Perfil() {
       case 'CANCELADA': return 'status-cancelada';
       default: return '';
     }
+  };
+  const irParaCheckin = (id) => {
+    navigate(`/checkin/${id}`);
   };
 
   return (
@@ -124,7 +136,9 @@ function Perfil() {
                   </div>
                   
                   {reserva.status === 'FAZER CHECK-IN' ? (
-                    <button className="badge checkin-btn">
+                    <button 
+                      className="badge checkin-btn"
+                      onClick={() => irParaCheckin(reserva.id)}>
                       {reserva.status} &gt;
                     </button>
                   ) : (

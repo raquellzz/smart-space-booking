@@ -1,12 +1,13 @@
 package imd.ufrn.com.br.smart_space_booking.repository;
 
-import imd.ufrn.com.br.smart_space_booking.model.Reserva;
+import java.time.ZonedDateTime;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.ZonedDateTime;
-import java.util.List;
+import imd.ufrn.com.br.smart_space_booking.model.Reserva;
 
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
@@ -35,4 +36,9 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
             "AND r.tipo <> 'MANUTENCAO' " +
             "ORDER BY r.createdAt DESC")
     List<Reserva> findReservasPorUsuario(@Param("usuarioId") Long usuarioId);
+
+    @Query("SELECT r FROM Reserva r WHERE r.status = 'CONFIRMADA' " +
+           "AND r.fotoCheckinId IS NULL " +
+           "AND r.inicioDateTime <= :limiteTolerancia")
+    List<Reserva> findReservasPendentesExpiradas(@Param("limiteTolerancia") ZonedDateTime limiteTolerancia);
 }

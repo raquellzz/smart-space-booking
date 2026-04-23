@@ -5,8 +5,10 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import imd.ufrn.com.br.smart_space_booking.dto.CheckinRequestDTO;
 import imd.ufrn.com.br.smart_space_booking.dto.HorarioOcupadoDTO;
 import imd.ufrn.com.br.smart_space_booking.dto.ReservaRequestDTO;
 import imd.ufrn.com.br.smart_space_booking.dto.ReservaResponseDTO;
@@ -64,6 +66,9 @@ public class ReservaService {
         reserva.setStatus(ReservaStatus.CONFIRMADA);
         reserva.setUsuario(usuario);
         reserva.setSala(sala);
+        reserva.setFotoCheckinId(null);
+        reserva.setDataHoraCheckin(null);
+        reserva.setMotivoCancelamento(null);
 
         reservaRepository.save(reserva);
 
@@ -117,5 +122,63 @@ public class ReservaService {
                 .stream()
                 .map(ReservaResponseDTO::fromEntity)
                 .toList();
+    }
+    @Transactional
+    public void realizarCheckin(Long reservaId, Long usuarioLogadoId, CheckinRequestDTO dto) {
+        Reserva reserva = reservaRepository.findById(reservaId)
+                .orElseThrow(() -> new ReservaNotFoundException("Reserva não encontrada"));
+        
+        if (reserva.getUsuario() == null) {
+            throw new RuntimeException("Erro interno: A reserva no banco está sem usuário associado.");
+        }
+
+        if (!reserva.getUsuario().getId().equals(usuarioLogadoId)) {
+            throw new RegraNegocioException("Acesso negado: Você não pode fazer check-in em uma reserva de outro usuário.");
+        }
+
+        if (reserva.getStatus() == ReservaStatus.CANCELADA) {
+            throw new RegraNegocioException("Não é possível fazer check-in de uma reserva cancelada.");
+        }
+
+        if (reserva.getDataHoraCheckin() != null) {
+            throw new RegraNegocioException("Check-in já foi realizado para esta reserva.");
+        }
+        ZonedDateTime agora = ZonedDateTime.now();
+        ZonedDateTime inicio = reserva.getInicioDateTime();
+        ZonedDateTime limiteCheckin = inicio.plusMinutes(10);
+
+        if (agora.isBefore(inicio)) {
+            throw new RuntimeException("O horário da reserva ainda não começou.");
+        }
+
+        if (agora.isAfter(limiteCheckin)) {
+            reserva.setStatus(ReservaStatus.CANCELADA);
+            reserva.setMotivoCancelamento("NO_SHOW");
+            reservaRepository.save(reserva);
+            throw new RegraNegocioException("Tempo de check-in expirado. Reserva cancelada por No-Show.");
+        }
+
+        reserva.setFotoCheckinId(dto.fotoCheckinId());
+        reserva.setDataHoraCheckin(agora);
+        
+        reservaRepository.save(reserva);
+    }
+
+    @Scheduled(fixedRate = 60000)
+    @Transactional
+    public void cancelarReservasExpiradasPorNoShow() {
+        ZonedDateTime agora = ZonedDateTime.now();
+        ZonedDateTime limiteTolerancia = agora.minusMinutes(10);
+
+        List<Reserva> reservasExpiradas = reservaRepository.findReservasPendentesExpiradas(limiteTolerancia);
+
+        if (!reservasExpiradas.isEmpty()) {
+            for (Reserva reserva : reservasExpiradas) {
+                reserva.setStatus(ReservaStatus.CANCELADA);
+                reserva.setMotivoCancelamento("NO_SHOW_AUTOMATICO");
+            }
+            reservaRepository.saveAll(reservasExpiradas);
+            System.out.println("Scheduler: Canceladas " + reservasExpiradas.size() + " reservas por No-Show.");
+        }
     }
 }

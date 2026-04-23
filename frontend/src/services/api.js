@@ -22,4 +22,15 @@ export const getHorariosOcupados = (salaId, data) =>
     params: { salaId, data },
   });
 
+export const realizarCheckinReserva = (id, usuarioId, fotoCheckinId) => {
+  api.post(`/reservas/${id}/checkin`, 
+    { fotoCheckinId: String(fotoCheckinId) },
+    { 
+      headers: { 
+        'X-Usuario-Id': usuarioId
+      } 
+    }
+  );
+};
+
 export default api;
