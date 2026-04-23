@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cadastrarSala } from '../../services/api'
+import { uploadArquivo } from '../../services/apiFiles';
+import axios from 'axios';
 import './CadastroSala.css';
 import './Admin.css';
 import '../../App.css';
@@ -19,23 +21,46 @@ function CadastroSala() {
     imagem: ''
   });
 
+  const [arquivosSelecionados, setArquivosSelecionados] = useState([]);
+  const [carregando, setCarregando] = useState(false);
+
+  const handleFileChange = (e) => {
+    const novosFiles = Array.from(e.target.files);
+    setArquivosSelecionados((prev) => [...prev, ...novosFiles]);
+    e.target.value = null;
+  };
+
+  const removerArquivo = (indexParaRemover) => {
+    setArquivosSelecionados((prev) =>
+      prev.filter((_, index) => index !== indexParaRemover)
+    );
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+     if (arquivosSelecionados.length === 0) {
+      alert("Por favor, selecione pelo menos uma imagem para a sala.");
+      return; 
+    }
+
+    setCarregando(true);
+
     try {
+
+      const uploadPromises = arquivosSelecionados.map(file => uploadArquivo(file));
+      const imageIDs = await Promise.all(uploadPromises);
+
       const listaCaracteristicas = formData.caracteristicasTexto
         .split(',')
         .map(item => item.trim())
         .filter(item => item !== "");
 
       const dadosParaEnviar = {
-        nome: formData.nome,
+        ...formData,
         capacidade: parseInt(formData.capacidade),
-        local: formData.local,
-        status: formData.status,
-        tipoSala: formData.tipoSala,
         caracteristicas: listaCaracteristicas,
-        //imagem: formData.imagem
+        imagens: imageIDs
       };
 
       await cadastrarSala(dadosParaEnviar);
@@ -43,8 +68,10 @@ function CadastroSala() {
       alert("Sala cadastrada com sucesso!");
       navigate('/admin');
     } catch (error) {
-      console.error("Erro ao cadastrar sala:", error);
-      alert("Falha ao cadastrar a sala. Verifique se o Back-end está rodando.");
+      console.error("Erro no cadastro:", error);
+      alert("Erro ao processar imagens ou cadastrar sala.");
+    } finally {
+      setCarregando(false);
     }
   };
 
@@ -127,21 +154,42 @@ function CadastroSala() {
           </div>
 
           <div className="input-group">
-            <label>Imagem da Sala</label>
-            <input 
-              type="text" 
-              placeholder="Cole o link da foto"
-              value={formData.imagem}
-              onChange={(e) => setFormData({...formData, imagem: e.target.value})}
+            <label>Fotos da Sala</label>
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handleFileChange}
+              className="file-input"
             />
           </div>
+
+          <div className="file-list-preview">
+              {arquivosSelecionados.map((arquivo, index) => (
+                <div key={index} className="file-item">
+                  <span className="material-icons">image</span>
+                  <span className="file-name">{arquivo.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => removerArquivo(index)}
+                    className="btn-remove-file"
+                  >
+                    <span className="material-icons">close</span>
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {arquivosSelecionados.length > 0 && (
+              <small>{arquivosSelecionados.length} imagem(ns) preparadas para upload.</small>
+            )}
 
           <div className="cadastro-actions">
             <button type="button" className="btn-cancel" onClick={() => navigate('/admin')}>
               Cancelar
             </button>
-            <button type="submit" className="btn-primary btn-save">
-              Salvar Sala
+            <button type="submit" className="btn-primary btn-save" disabled={carregando}>
+              {carregando ? "Fazendo Upload..." : "Salvar Sala"}
             </button>
           </div>
         </form>

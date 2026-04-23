@@ -10,6 +10,7 @@ import {
 } from "../../services/api";
 import "./Reserva.css";
 
+const FILE_SERVER_URL = import.meta.env.VITE_API_FILES_URL;
 const USER_ID = 1;
 
 const getHoraAtual = () => {
@@ -232,7 +233,7 @@ export default function Reserva() {
             <div className="reserva-sala-header">
               <div className="sala-info-main">
                 <img
-                  src={sala?.imagem || imagemMockada}
+                  src={`${FILE_SERVER_URL}/${sala.imagens[0]}` || imagemMockada}
                   alt="Sala"
                   className="sala-img-mini"
                 />
