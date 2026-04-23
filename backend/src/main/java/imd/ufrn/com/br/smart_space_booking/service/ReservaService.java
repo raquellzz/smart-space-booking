@@ -5,6 +5,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import imd.ufrn.com.br.smart_space_booking.dto.HorarioOcupadoDTO;
@@ -160,6 +161,23 @@ public class ReservaService {
 //        reserva.setMotivoCancelamento("CANCELADO MANUALMENTE");
 //        reservaRepository.save(reserva);
 //    }
+
+    @Scheduled(fixedRate = 30000)
+    @Transactional
+    public void cancelarReservasExpiradasPorNoShow() {
+        ZonedDateTime agora = ZonedDateTime.now();
+        ZonedDateTime limiteTolerancia = agora.minusMinutes(10);
+
+        List<Reserva> reservasExpiradas = reservaRepository.findReservasPendentesExpiradas(limiteTolerancia);
+
+        if (!reservasExpiradas.isEmpty()) {
+            for (Reserva reserva : reservasExpiradas) {
+                reserva.setStatus(ReservaStatus.CANCELADA);
+                reserva.setMotivoCancelamento("NO_SHOW_AUTOMATICO");
+            }
+            reservaRepository.saveAll(reservasExpiradas);
+        }
+    }
 
     public List<HorarioOcupadoDTO> findOcupados(Long salaId, LocalDate data) {
         ZonedDateTime inicioDia = data.atStartOfDay(ZoneId.of("America/Fortaleza"));

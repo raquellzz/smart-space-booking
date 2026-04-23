@@ -65,15 +65,17 @@ function Perfil() {
         statusVisual = "CANCELAR";
       } else if (agora >= dataInicio && agora <= dataFim) {
         statusVisual = "FAZER CHECK-IN";
-      } else {
-        statusVisual = "EXPIRADA";
-      }
+      } 
     } else if (r.status === "EM_ANDAMENTO") {
       statusVisual = "FAZER CHECK-OUT";
     } else if (r.status === "ENCERRADA") {
       statusVisual = "CONCLUÍDA";
     } else if (r.status === "CANCELADA") {
-      statusVisual = "CANCELADA";
+      if(r.motivoCancelamento === "NO_SHOW_AUTOMATICO") {
+        statusVisual = "EXPIRADA";
+      } else {
+        statusVisual = "CANCELADA";
+      }
     }
 
     return {
